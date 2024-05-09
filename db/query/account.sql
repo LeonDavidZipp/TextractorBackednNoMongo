@@ -28,6 +28,9 @@ OFFSET $3;
 REMOVE FROM accounts
 WHERE id = $1;
 
--- name: AddImage :one
+-- name: AddImages :one
+UPDATE accounts
+SET image_count = image_count + sqlc.arg(amount)
 
 -- name: UpdateAccount :one
+
