@@ -10,7 +10,7 @@ LABEL maintainer="lzipp"
 
 WORKDIR /app
 COPY ./db ./db
-COPY ./api ./api
+# COPY ./api ./api
 COPY ./go.mod ./
 COPY ./go.sum ./
 RUN go mod download

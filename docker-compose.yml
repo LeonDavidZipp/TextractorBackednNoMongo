@@ -1,49 +1,57 @@
 services:
-  app:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-      target: dev # target stage to build, CHANGE to prod for production
-    restart: always
-    expose:
-      - 8080
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    volumes: # remove after testing
-      - .:/app
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: dev # target stage to build, CHANGE to prod for production
+        restart: always
+        expose:
+            - 8080
+        ports:
+            - "8080:8080"
+        depends_on:
+            - user-db
+            # - mongo-db
+        volumes: # remove after testing
+            - .:/app
 
-  user-db:
-    image: "postgres:16.2-alpine3.19"
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=test1234
-      - POSTGRES_USER=exampleuser
-    expose:
-      - 5432
-    ports:
-      - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
+    user-db:
+        image: "postgres:16.2-alpine3.19"
+        restart: always
+        environment:
+            - POSTGRES_PASSWORD=test1234
+            - POSTGRES_USER=exampleuser
+        expose:
+            - 5432
+        ports:
+            - "5432:5432"
+        volumes:
+            - user-data:/var/lib/postgresql/data
 
-  mongo-db:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+    # mongo-db:
+    #   image: mongo
+    #   restart: always
+    #   environment:
+    #     MONGO_INITDB_ROOT_USERNAME: root
+    #     MONGO_INITDB_ROOT_PASSWORD: example
+    #   expose:
+    #     - 27017
+    #   ports:
+    #     - "27017:27017"
+    #   volumes:
+    #     - image-data:/data/db
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-      ME_CONFIG_BASICAUTH: false
+    # mongo-express:
+    #   image: mongo-express
+    #   restart: always
+    #   ports:
+    #     - 8081:8081
+    #   environment:
+    #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+    #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    #     ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+    #     ME_CONFIG_BASICAUTH: false
 
 volumes:
-  db-data:
+    user-data:
+    # image-data:

@@ -18,19 +18,23 @@ SELECT * FROM accounts
 WHERE id = $1
 LIMIT 1;
 
--- name: ListAccounts : many
+-- name: ListAccounts :many
 SELECT * FROM accounts
 ORDER BY $1
 LIMIT $2
 OFFSET $3;
 
 -- name: DeleteAccount :exec
-REMOVE FROM accounts
+DELETE FROM accounts
 WHERE id = $1;
 
 -- name: AddImages :one
 UPDATE accounts
 SET image_count = image_count + sqlc.arg(amount)
+RETURNING *;
 
 -- name: UpdateAccount :one
-
+UPDATE accounts
+SET email = $2
+WHERE id = $1
+RETURNING *;
