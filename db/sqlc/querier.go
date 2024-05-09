@@ -6,7 +6,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 type Querier interface {
@@ -16,7 +15,7 @@ type Querier interface {
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
 	UpdateEmail(ctx context.Context, arg UpdateEmailParams) (Account, error)
-	UpdateImageCount(ctx context.Context, amount sql.NullInt64) (Account, error)
+	UpdateImageCount(ctx context.Context, arg UpdateImageCountParams) (Account, error)
 	UpdateSubscribed(ctx context.Context, arg UpdateSubscribedParams) (Account, error)
 }
 

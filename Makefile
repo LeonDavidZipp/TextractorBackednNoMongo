@@ -24,21 +24,21 @@ startdb:
 	&& make migrateup
 
 createdb:
-	docker-compose exec db createdb -U exampleuser simple_bank
+	docker-compose exec db createdb -U exampleuser userdata
 
 dropdb:
-	docker-compose exec db dropdb -U exampleuser simple_bank
+	docker-compose exec db dropdb -U exampleuser userdata
 
 migrateup:
-	docker-compose run --rm app migrate -path ./db/migrations -database "postgresql://exampleuser:test1234@db:5432/simple_bank?sslmode=disable" -verbose up
+	docker-compose run --rm app migrate -path ./db/migrations -database "postgresql://exampleuser:test1234@db:5432/userdata?sslmode=disable" -verbose up
 
 migratedown:
-	docker-compose run --rm app migrate -path ./db/migrations -database "postgresql://exampleuser:test1234@db:5432/simple_bank?sslmode=disable" -verbose down
+	docker-compose run --rm app migrate -path ./db/migrations -database "postgresql://exampleuser:test1234@db:5432/userdata?sslmode=disable" -verbose down
 
 restartdb: dropdb createdb migrateup
 
 dbcmd:
-	docker-compose exec db psql -U exampleuser -d simple_bank -c "$(cmd)"
+	docker-compose exec db psql -U exampleuser -d userdata -c "$(cmd)"
 
 #############################################################################################################################################################################
 #																																											#
@@ -65,7 +65,7 @@ appcmd:
 	docker-compose run --rm app sh -c "$(cmd)"
 
 mockdb:
-	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/go_simple_bank/db/sqlc $(iname)"
+	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/textractor/db/sqlc $(iname)"
 
 #############################################################################################################################################################################
 #																																											#

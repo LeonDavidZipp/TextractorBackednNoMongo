@@ -4,7 +4,7 @@ CREATE TABLE "accounts" (
   "email" varchar NOT NULL,
   "google_id" varchar DEFAULT NULL,
   "facebook_id" varchar DEFAULT NULL,
-  "image_count" bigint DEFAULT 0,
+  "image_count" bigint NOT NULL DEFAULT 0,
   "subscribed" bool NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );

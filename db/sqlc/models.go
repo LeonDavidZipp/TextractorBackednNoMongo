@@ -17,7 +17,7 @@ type Account struct {
 	GoogleID sql.NullString `json:"google_id"`
 	// facebook calls it ...
 	FacebookID sql.NullString `json:"facebook_id"`
-	ImageCount sql.NullInt64  `json:"image_count"`
+	ImageCount int64          `json:"image_count"`
 	Subscribed bool           `json:"subscribed"`
 	CreatedAt  time.Time      `json:"created_at"`
 }

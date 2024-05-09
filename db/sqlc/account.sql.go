@@ -178,11 +178,17 @@ func (q *Queries) UpdateEmail(ctx context.Context, arg UpdateEmailParams) (Accou
 const updateImageCount = `-- name: UpdateImageCount :one
 UPDATE accounts
 SET image_count = image_count + $1
+WHERE id = $2
 RETURNING id, owner, email, google_id, facebook_id, image_count, subscribed, created_at
 `
 
-func (q *Queries) UpdateImageCount(ctx context.Context, amount sql.NullInt64) (Account, error) {
-	row := q.db.QueryRowContext(ctx, updateImageCount, amount)
+type UpdateImageCountParams struct {
+	Amount int64 `json:"amount"`
+	ID     int64 `json:"id"`
+}
+
+func (q *Queries) UpdateImageCount(ctx context.Context, arg UpdateImageCountParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateImageCount, arg.Amount, arg.ID)
 	var i Account
 	err := row.Scan(
 		&i.ID,

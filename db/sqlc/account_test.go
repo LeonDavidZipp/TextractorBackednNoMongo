@@ -74,7 +74,6 @@ func TestUpdateEmail(t *testing.T) {
 
 	require.Equal(t, account1.ID, account2.ID)
 	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, account1.Email, account2.Email)
 	require.Equal(t, account1.GoogleID, account2.GoogleID)
 	require.Equal(t, account1.FacebookID, account2.FacebookID)
 	require.Equal(t, account1.ImageCount, account2.ImageCount)
@@ -102,8 +101,29 @@ func TestUpdateSubscribed(t *testing.T) {
 	require.Equal(t, account1.GoogleID, account2.GoogleID)
 	require.Equal(t, account1.FacebookID, account2.FacebookID)
 	require.Equal(t, account1.ImageCount, account2.ImageCount)
-	require.Equal(t, account1.Subscribed, account2.Subscribed)
 	require.Equal(t, arg.Subscribed, account2.Subscribed)
+}
+
+func TestUpdateImageCount(t *testing.T) {
+	account1 := createRandomAccount(t)
+	arg := UpdateImageCountParams{
+		ID : account1.ID,
+		Amount : 10,
+	}
+
+	ctx := context.Background()
+	account2, err := testQueries.UpdateImageCount(ctx, arg)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, account2)
+
+	require.Equal(t, account1.ID, account2.ID)
+	require.Equal(t, account1.Owner, account2.Owner)
+	require.Equal(t, account1.Email, account2.Email)
+	require.Equal(t, account1.GoogleID, account2.GoogleID)
+	require.Equal(t, account1.FacebookID, account2.FacebookID)
+	require.Equal(t, account1.ImageCount + arg.Amount, account2.ImageCount)
+	require.Equal(t, account1.Subscribed, account2.Subscribed)
 }
 
 func TestDeleteAccount(t *testing.T) {
@@ -118,25 +138,6 @@ func TestDeleteAccount(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, account2)
-}
-
-func TestUpdateImageCount(t *testing.T) {
-	account1 := createRandomAccount(t)
-	amount := 10
-
-	ctx := context.Background()
-	account2, err := testQueries.UpdateImageCount(ctx, amount)
-
-	require.NoError(t, err)
-	require.NotEmpty(t, account2)
-
-	require.Equal(t, account1.ID, account2.ID)
-	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, account1.Email, account2.Email)
-	require.Equal(t, account1.GoogleID, account2.GoogleID)
-	require.Equal(t, account1.FacebookID, account2.FacebookID)
-	require.Equal(t, int(account1.ImageCount) + amount, account2.ImageCount)
-	require.Equal(t, account1.Subscribed, account2.Subscribed)
 }
 
 func TestListAccounts(t *testing.T) {

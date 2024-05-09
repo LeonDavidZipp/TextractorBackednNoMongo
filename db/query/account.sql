@@ -31,6 +31,7 @@ WHERE id = $1;
 -- name: UpdateImageCount :one
 UPDATE accounts
 SET image_count = image_count + sqlc.arg(amount)
+WHERE id = sqlc.arg(id)
 RETURNING *;
 
 -- name: UpdateEmail :one
