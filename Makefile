@@ -37,7 +37,7 @@ migratedown:
 
 restartdb: dropdb createdb migrateup
 
-runcmd:
+dbcmd:
 	docker-compose exec db psql -U exampleuser -d simple_bank -c "$(cmd)"
 
 #############################################################################################################################################################################
@@ -60,6 +60,9 @@ get:
 
 server:
 	docker-compose run --rm app sh -c "go run main.go"
+
+appcmd:
+	docker-compose run --rm app sh -c "$(cmd)"
 
 mockdb:
 	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/go_simple_bank/db/sqlc $(iname)"

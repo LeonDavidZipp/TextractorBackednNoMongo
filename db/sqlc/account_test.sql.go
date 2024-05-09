@@ -6,8 +6,7 @@ import (
 	"time"
 	"database/sql"
 	"github.com/stretchr/testify/require"
-	"github.com/LeonDavidZipp/Textractor"
-	"net/mail"
+	"github.com/LeonDavidZipp/Textractor/util"
 )
 
 
@@ -15,8 +14,8 @@ func createRandomAccount(t *testing.T) Account {
 	arg := CreateAccountParams{
 		Owner : util.RandomName(),
 		Email : util.RandomEmail(),
-		GoogleID : nil,
-		FacebookID : nil,
+		GoogleID : sql.NullString{},
+		FacebookID : sql.NullString{},
 	}
 
 	ctx := context.Background()
@@ -56,11 +55,11 @@ func TestGetAccount(t *testing.T) {
 	require.Equal(t, account1.ImageCount, account2.ImageCount)
 	require.Equal(t, account1.Subscribed, account2.Subscribed)
 
-	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt)
+	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, 10 * time.Second)
 }
 
 func TestUpdateEmail(t *testing.T) {
-	account1 = createRandomAccount()
+	account1 := createRandomAccount(t)
 
 	arg := UpdateEmailParams{
 		ID : account1.ID,
@@ -68,7 +67,7 @@ func TestUpdateEmail(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	account2, err := TestQueries.UpdateEmail(ctx, arg)
+	account2, err := testQueries.UpdateEmail(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -83,8 +82,8 @@ func TestUpdateEmail(t *testing.T) {
 	require.Equal(t, arg.Email, account2.Email)
 }
 
-func TestUpdateEmail(t *testing.T) {
-	account1 = createRandomAccount()
+func TestUpdateSubscribed(t *testing.T) {
+	account1 := createRandomAccount(t)
 
 	arg := UpdateSubscribedParams{
 		ID : account1.ID,
@@ -92,7 +91,7 @@ func TestUpdateEmail(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	account2, err := TestQueries.UpdateEmail(ctx, arg)
+	account2, err := testQueries.UpdateSubscribed(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -108,13 +107,13 @@ func TestUpdateEmail(t *testing.T) {
 }
 
 func TestDeleteAccount(t *testing.T) {
-	account1 = createRandomAccount()
+	account1 := createRandomAccount(t)
 
 	ctx := context.Background()
-	err := TestQueries.DeleteAccount(ctx, account1.ID)
+	err := testQueries.DeleteAccount(ctx, account1.ID)
 	require.NoError(t, err)
 
-	account2, err := TestQueries.GetAccount(ctx, account1.ID)
+	account2, err := testQueries.GetAccount(ctx, account1.ID)
 
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
@@ -122,11 +121,11 @@ func TestDeleteAccount(t *testing.T) {
 }
 
 func TestUpdateImageCount(t *testing.T) {
-	account1 := createRandomAccount()
+	account1 := createRandomAccount(t)
 	amount := 10
 
 	ctx := context.Background()
-	account2, err := TestQueries.UpdateImageCount(ctx, amount)
+	account2, err := testQueries.UpdateImageCount(ctx, amount)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -136,14 +135,13 @@ func TestUpdateImageCount(t *testing.T) {
 	require.Equal(t, account1.Email, account2.Email)
 	require.Equal(t, account1.GoogleID, account2.GoogleID)
 	require.Equal(t, account1.FacebookID, account2.FacebookID)
-	require.Equal(t, account1.ImageCount + amount, account2.ImageCount)
+	require.Equal(t, int(account1.ImageCount) + amount, account2.ImageCount)
 	require.Equal(t, account1.Subscribed, account2.Subscribed)
-	require.Equal(t, arg.Subscribed, account2.Subscribed)
 }
 
 func TestListAccounts(t *testing.T) {
 	for i :=0; i < 10; i++ {
-		createRandomAccount()
+		createRandomAccount(t)
 	}
 
 	arg := ListAccountsParams{
@@ -152,7 +150,7 @@ func TestListAccounts(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	accounts, err := TestQueries.ListAccounts(ctx)
+	accounts, err := testQueries.ListAccounts(ctx, arg)
 
 	require.NoError(t, err)
 	require.Len(t, accounts, 5)
