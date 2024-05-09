@@ -19,7 +19,7 @@ func RandomString(n int) string {
     return string(b)
 }
 
-func RandomOwner() string {
+func RandomName() string {
 	return RandomString(8)
 }
 

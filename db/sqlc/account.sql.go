@@ -10,28 +10,6 @@ import (
 	"database/sql"
 )
 
-const addImages = `-- name: AddImages :one
-UPDATE accounts
-SET image_count = image_count + $1
-RETURNING id, owner, email, google_id, facebook_id, image_count, subscribed, created_at
-`
-
-func (q *Queries) AddImages(ctx context.Context, amount sql.NullInt64) (Account, error) {
-	row := q.db.QueryRowContext(ctx, addImages, amount)
-	var i Account
-	err := row.Scan(
-		&i.ID,
-		&i.Owner,
-		&i.Email,
-		&i.GoogleID,
-		&i.FacebookID,
-		&i.ImageCount,
-		&i.Subscribed,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
 const createAccount = `-- name: CreateAccount :one
 INSERT INTO accounts (
     owner,
@@ -127,19 +105,18 @@ func (q *Queries) GetAccountForUpdate(ctx context.Context, id int64) (Account, e
 
 const listAccounts = `-- name: ListAccounts :many
 SELECT id, owner, email, google_id, facebook_id, image_count, subscribed, created_at FROM accounts
-ORDER BY $1
-LIMIT $2
-OFFSET $3
+ORDER BY id
+LIMIT $1
+OFFSET $2
 `
 
 type ListAccountsParams struct {
-	Column1 interface{} `json:"column_1"`
-	Limit   int32       `json:"limit"`
-	Offset  int32       `json:"offset"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error) {
-	rows, err := q.db.QueryContext(ctx, listAccounts, arg.Column1, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listAccounts, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -170,20 +147,70 @@ func (q *Queries) ListAccounts(ctx context.Context, arg ListAccountsParams) ([]A
 	return items, nil
 }
 
-const updateAccount = `-- name: UpdateAccount :one
+const updateEmail = `-- name: UpdateEmail :one
 UPDATE accounts
 SET email = $2
 WHERE id = $1
 RETURNING id, owner, email, google_id, facebook_id, image_count, subscribed, created_at
 `
 
-type UpdateAccountParams struct {
+type UpdateEmailParams struct {
 	ID    int64  `json:"id"`
 	Email string `json:"email"`
 }
 
-func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {
-	row := q.db.QueryRowContext(ctx, updateAccount, arg.ID, arg.Email)
+func (q *Queries) UpdateEmail(ctx context.Context, arg UpdateEmailParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateEmail, arg.ID, arg.Email)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Email,
+		&i.GoogleID,
+		&i.FacebookID,
+		&i.ImageCount,
+		&i.Subscribed,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateImageCount = `-- name: UpdateImageCount :one
+UPDATE accounts
+SET image_count = image_count + $1
+RETURNING id, owner, email, google_id, facebook_id, image_count, subscribed, created_at
+`
+
+func (q *Queries) UpdateImageCount(ctx context.Context, amount sql.NullInt64) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateImageCount, amount)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Email,
+		&i.GoogleID,
+		&i.FacebookID,
+		&i.ImageCount,
+		&i.Subscribed,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateSubscribed = `-- name: UpdateSubscribed :one
+UPDATE accounts
+SET subscribed = $2
+WHERE id = $1
+RETURNING id, owner, email, google_id, facebook_id, image_count, subscribed, created_at
+`
+
+type UpdateSubscribedParams struct {
+	ID         int64 `json:"id"`
+	Subscribed bool  `json:"subscribed"`
+}
+
+func (q *Queries) UpdateSubscribed(ctx context.Context, arg UpdateSubscribedParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, updateSubscribed, arg.ID, arg.Subscribed)
 	var i Account
 	err := row.Scan(
 		&i.ID,
