@@ -35,3 +35,13 @@ func NewServer(store db.Store) *Server { // testing: remove later
 
 	return server
 }
+
+// Starts http server on specified address
+func (server *Server) Start(address string) error {
+	return server.router.Run(address)
+}
+
+// formats error response into json body
+func errorResponse(err error) gin.H {
+	return gin.H{"error": err.Error()}
+}
