@@ -15,12 +15,14 @@ type Store struct {
 }
 
 type UploadImageTransactionParams struct {
-	Filepath string `json:"filepath"`
 	AccountID int64 `json:"account_id"`
+	Filepath string `json:"filepath"`
+	Text string `json:"text"`
 }
 
 type UploadImageTransactionResult struct {
-
+	Text string `json:"text"`
+	Uploader Account `json:"uploader"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
@@ -32,15 +34,31 @@ func (store *Store) UploadImage(
 }
 
 // Uploads the data to postgres accounts table
-func (store *Store) uploadToPostgres(querie *Queries) error {
-	var result UploadImageTransactionResult
+func (store *Store) uploadToPostgres(
+	ctx context.Context,
+	querie *Queries,
+	AccountID int64,
+	result *UploadImageTransactionResult
+	) error {
+	result.Uploader, err := querie.UpdateImageCount(ctx, UpdateImageCountParams{
+		Amount: 1,
+		ID: arg.AccountID,
+	})
 
 
 }
 
 // Uploads the image to mongodb table
-func (store *Store) uploadToMongo(mongoCtx ) error {
+func (store *Store) uploadToMongo(
+	mongoCtx mongo.SessionContext,
+	arg 
+	) error {
 	mongoDB, err := ImageDBClient.Database()
+}
+
+type ExecTransactionParams struct {
+	Filepath string `json:"filepath"`
+	Text string `json:"text"`
 }
 
 // execTransaction creates a "rollback-able" transaction.
@@ -52,9 +70,10 @@ func (store *Store) uploadToMongo(mongoCtx ) error {
 // 	a function uploading image to mongodb table
 func (store *Store) execTransaction(
 	ctx context.Context,
-	filepath string,
-	text string,
-	fnSql func(*Queries) error,
+	// filepath string,
+	// text string,
+	arg UploadImageTransactionParams,
+	fnSql func(context.Context, *Queries, int64, *UploadImageTransactionResult) error,
 	fnMongo func(mongo.SessionContext, string, string) error
 	) error {
 	// postgres
@@ -64,7 +83,7 @@ func (store *Store) execTransaction(
 	}
 
 	sqlQuerie := New(sqlTransaction)
-	err = fnSql(sqlQuerie)
+	err = fnSql(sqlQuerie, arg.AccountID)
 	if err != nil {
 		if rollbackErr := sqlTransaction.Rollback(), rollbackErr != nil {
 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
@@ -92,7 +111,7 @@ func (store *Store) execTransaction(
 
 	// TODO: move database into fnMongo, implement uploading image in fnMongo
 	err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
-		return fnMongo(sessionContext, filePath, text) // Pass file path to fnMongo
+		return fnMongo(sessionContext, arg) // Pass file path to fnMongo
 	})
 	if er != nil {
 		if rollbackErr := sqlTransaction.Rollback(), rollbackErr != nil {
