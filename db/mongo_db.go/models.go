@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+
 // this struct is used to store the account information
 // only for learning, not most efficient way to store
 type Image struct {
