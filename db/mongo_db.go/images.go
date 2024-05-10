@@ -14,3 +14,5 @@ func (store *Store) CreateImage(
 }
 
 func (store *Store) GetImage(ctx context.Context, id string) (*Image, error) {
+	
+}
