@@ -13,12 +13,13 @@ type Server struct {
 	router *gin.Engine
 }
 
-func NewServer(store db.Store) *Server { // testing: remove later
+func NewServer(store db.Store) *Server {
 	server := &Server{
 		store : store,
 	}
 
 	router := gin.Default()
+
 	// Accounts (Postgres)
 	router.POST("/accounts", server.createAccount)
 	router.GET("/accounts/:id", server.getAccount)

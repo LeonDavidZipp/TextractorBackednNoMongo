@@ -12,14 +12,14 @@ import (
 type Store struct {
 	Querier
 	UserDB *sql.DB
-	ImageDBClient *mongodb.Client
+	ImageDB *mongodb.Database
 }
 
-func NewStore(db *sql.DB, mongoClient *mongodb.Client) *Store {
+func NewStore(userDB *sql.DB, imageDB *mongodb.Database) *Store {
 	return &Store{
-		Querier: New(db),
-		UserDB: db,
-		ImageDBClient: mongoClient,
+		Querier: New(userDB),
+		UserDB: userDB,
+		ImageDB: imageDB,
 	}
 }
 

@@ -17,24 +17,25 @@ func main() {
 		log.Fatal("Cannot load config:", err)
 	}
 
-	sqlConnection, err := sql.Open(
-		config.DBDriver,
-		config.DBSource,
-	)
+	userDB, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
-		log.Fatal("Cannot connect to db:", err)
+		log.Fatal("Cannot connect to User DB:", err)
 	}
 
-	optionsClient := options.Client().ApplyURI(config.Mongo_Source)
+	optionsClient := options.Client().ApplyURI(config.MongoSource)
 	mongoClient, err := mongo.Connect(ctx, optionsClient)
 	if err != nil {
-		log.Fatal("Cannot connect to mongo:", err)
+		log.Fatal("Cannot connect to Image DB:", err)
 	}
 	defer mongoClient.Disconnect(ctx)
 
+	imageDB := mongoClient.Database(config.MongoDBName)
+	err := imageDB.Client().Ping(ctx, nil)
+	if err != nil {
+		log.Fatal("Image DB not reachable:", err)
+	}
 
-
-	store := db.NewStore(sqlConnection, mongoClient)
+	store := db.NewStore(userDB, imageDB)
 	server := api.NewServer(store)
 
 	err = server.Start(config.ServerAddress)
