@@ -44,21 +44,18 @@ func (store *Store) uploadToPostgres(
 		Amount: 1,
 		ID: arg.AccountID,
 	})
-
-
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Uploads the image to mongodb table
 func (store *Store) uploadToMongo(
 	mongoCtx mongo.SessionContext,
-	arg 
+	arg
 	) error {
 	mongoDB, err := ImageDBClient.Database()
-}
-
-type ExecTransactionParams struct {
-	Filepath string `json:"filepath"`
-	Text string `json:"text"`
 }
 
 // execTransaction creates a "rollback-able" transaction.
@@ -70,8 +67,6 @@ type ExecTransactionParams struct {
 // 	a function uploading image to mongodb table
 func (store *Store) execTransaction(
 	ctx context.Context,
-	// filepath string,
-	// text string,
 	arg UploadImageTransactionParams,
 	fnSql func(context.Context, *Queries, int64, *UploadImageTransactionResult) error,
 	fnMongo func(mongo.SessionContext, string, string) error
