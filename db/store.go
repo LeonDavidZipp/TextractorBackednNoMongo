@@ -24,13 +24,14 @@ func NewStore(userDB *sql.DB, imageDB *mongodb.Database) *Store {
 }
 
 type UploadImageTransactionParams struct {
-	AccountID int64 `json:"account_id"`
-	Filepath string `json:"filepath"`
-	Text string `json:"text"`
+	AccountID int64  `json:"account_id"`
+	Filepath  string `json:"filepath"`
+	Text      string `json:"text"`
+	Link      string `json:"link"`
 }
 
 type UploadImageTransactionResult struct {
-	Text string `json:"text"`
+	Text     string  `json:"text"`
 	Uploader Account `json:"uploader"`
 }
 
