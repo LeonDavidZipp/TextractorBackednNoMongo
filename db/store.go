@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	mongodb "go.mongodb.org/mongo-driver/mongo"
+	options "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 
@@ -12,6 +13,14 @@ type Store struct {
 	Querier
 	UserDB *sql.DB
 	ImageDBClient *mongodb.Client
+}
+
+func NewStore(db *sql.DB, mongoClient *mongodb.Client) *Store {
+	return &Store{
+		Querier: New(db),
+		UserDB: db,
+		ImageDBClient: mongoClient,
+	}
 }
 
 type UploadImageTransactionParams struct {
@@ -53,9 +62,9 @@ func (store *Store) uploadToPostgres(
 // Uploads the image to mongodb table
 func (store *Store) uploadToMongo(
 	mongoCtx mongo.SessionContext,
-	arg
+	arg UploadImageTransactionParams
 	) error {
-	mongoDB, err := ImageDBClient.Database()
+	mongoDB, err := store.ImageDBClient.Database()
 }
 
 // execTransaction creates a "rollback-able" transaction.
