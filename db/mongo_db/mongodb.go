@@ -6,12 +6,16 @@ import (
 )
 
 
+// type MongoDBTX interface {
+// 	InsertOne(context.Context, interface{}, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
+// 	FindOne(context.Context, interface{}, ...*options.FindOneOptions) *mongo.SingleResult
+// 	Find(context.Context, interface{}, ...*options.FindOptions) (*mongo.Cursor, error)
+// 	UpdateOne(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (*mongo.UpdateResult, error)
+// 	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (*mongo.DeleteResult, error)
+// }
+
 type MongoDBTX interface {
-	InsertOne(context.Context, interface{}, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
-	FindOne(context.Context, interface{}, ...*options.FindOneOptions) *mongo.SingleResult
-	Find(context.Context, interface{}, ...*options.FindOptions) (*mongo.Cursor, error)
-	UpdateOne(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (*mongo.UpdateResult, error)
-	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (*mongo.DeleteResult, error)
+	Collection(string) *mongo.Collection
 }
 
 func NewMongo(db MongoDBTX) *MongoQueries {

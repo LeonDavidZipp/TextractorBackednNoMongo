@@ -20,11 +20,8 @@ type InsertImageParams struct {
 
 // InsertImage inserts a new image into the database
 // TODO: implement not for Store but for Mongo "Queries"
-func (q *MongoQueries) InsertImage(
-	ctx context.Context,
-	arg InsertImageParams
-) (Image, error) {
-	collection := store.ImageDB.Collection("images")
+func (q *MongoQueries) InsertImage(ctx context.Context, arg InsertImageParams) (Image, error) {
+	collection := q.db.Collection("images")
 	inserted, err := collection.insertOne(ctx, arg)
 
 	if err != nil {
@@ -44,7 +41,7 @@ func (q *MongoQueries) InsertImage(
 }
 
 func (q *MongoQueries) FindImage(ctx context.Context, id primitive.ObjectID) (Image, error) {
-	collection := store.ImageDB.Collection("images")
+	collection := q.db.Collection("images")
 	filter := bson.M{"_id": id}
 
 	var image Image
@@ -56,7 +53,7 @@ func (q *MongoQueries) FindImage(ctx context.Context, id primitive.ObjectID) (Im
 }
 
 func (q *MongoQueries) DeleteImage(ctx context.Context, id primitive.ObjectID) error {
-	collection := store.ImageDB.Collection("images")
+	collection := q.db.Collection("images")
 	filter := bson.M{"_id": id}
 
 	_, err := collection.DeleteOne(ctx, filter)
@@ -74,7 +71,7 @@ type UpdateImageParams struct {
 }
 
 func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
-	collection := store.ImageDB.Collection("images")
+	collection := q.db.Collection("images")
 	filter := bson.M{"_id": arg.ImageID}
 	update := bson.M{
 		"$set": bson.M{
