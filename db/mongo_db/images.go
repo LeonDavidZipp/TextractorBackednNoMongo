@@ -1,7 +1,7 @@
 package db
+
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,7 +14,6 @@ type InsertImageParams struct {
 	Text      string             `bson:"text" json:"text"`
 	// link to the image in s3 storage
 	Link      string             `bson:"link" json:"link"`
-	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	Image64   string             `bson:"image_64" json:"image_64"`
 }
 
@@ -33,7 +32,6 @@ func (q *MongoQueries) InsertImage(ctx context.Context, arg InsertImageParams) (
 		AccountID: arg.AccountID,
 		Text:      arg.Text,
 		Link:      arg.Link,
-		CreatedAt: arg.CreatedAt,
 		Image64:   arg.Image64,
 	}
 

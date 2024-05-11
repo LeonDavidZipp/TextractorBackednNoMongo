@@ -16,6 +16,5 @@ type Image struct {
 	Text      string             `bson:"text" json:"text"`
 	// link to the image in s3 storage
 	Link      string             `bson:"link" json:"link"`
-	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	Image64   string             `bson:"image_64" json:"image_64"`
 }

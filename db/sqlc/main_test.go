@@ -7,24 +7,27 @@ import (
 	"log"
 	"testing"
 	"github.com/LeonDavidZipp/Textractor/util"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var testUserQueries *Queries
-var testUserDB *sql.DB
+var testAccountQueries *Queries
+var testAccountDB *sql.DB
 
 var testImageQueries *MongoQueries
-var testtestImageDB *mongo.Database
+var testImageDB *mongo.Database
 
 func TestMain(m *testing.M) {
 	config, err := util.LoadConfig("../..")
-	testUserDB, err = sql.Open(
+	testAccountDB, err = sql.Open(
 		config.DBDriver,
 		config.DBSource,
 	)
 	if err != nil {
 		log.Fatal("Cannot connect to User DB:", err)
 	}
-	testUserQueries = New(testUserDB)
+	testAccountQueries = New(testAccountDB)
 
 	optionsClient := options.Client().ApplyURI(config.MongoSource)
 	mongoClient, err := mongo.Connect(ctx, optionsClient)
