@@ -19,7 +19,7 @@ func createRandomAccount(t *testing.T) Account {
 	}
 
 	ctx := context.Background()
-	account, err := testQueries.CreateAccount(ctx, arg)
+	account, err := testAccountQueries.CreateAccount(ctx, arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
 
@@ -42,7 +42,7 @@ func TestGetAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
 
 	ctx := context.Background()
-	account2, err := testQueries.GetAccount(ctx, account1.ID)
+	account2, err := testAccountQueries.GetAccount(ctx, account1.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -67,7 +67,7 @@ func TestUpdateEmail(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	account2, err := testQueries.UpdateEmail(ctx, arg)
+	account2, err := testAccountQueries.UpdateEmail(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -90,7 +90,7 @@ func TestUpdateSubscribed(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	account2, err := testQueries.UpdateSubscribed(ctx, arg)
+	account2, err := testAccountQueries.UpdateSubscribed(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -112,7 +112,7 @@ func TestUpdateImageCount(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	account2, err := testQueries.UpdateImageCount(ctx, arg)
+	account2, err := testAccountQueries.UpdateImageCount(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
@@ -130,10 +130,10 @@ func TestDeleteAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
 
 	ctx := context.Background()
-	err := testQueries.DeleteAccount(ctx, account1.ID)
+	err := testAccountQueries.DeleteAccount(ctx, account1.ID)
 	require.NoError(t, err)
 
-	account2, err := testQueries.GetAccount(ctx, account1.ID)
+	account2, err := testAccountQueries.GetAccount(ctx, account1.ID)
 
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
@@ -151,7 +151,7 @@ func TestListAccounts(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	accounts, err := testQueries.ListAccounts(ctx, arg)
+	accounts, err := testAccountQueries.ListAccounts(ctx, arg)
 
 	require.NoError(t, err)
 	require.Len(t, accounts, 5)

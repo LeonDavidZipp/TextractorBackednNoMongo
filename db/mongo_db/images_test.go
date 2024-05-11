@@ -16,13 +16,7 @@ import (
 
 func encodeImageToBase64(filepath string) string {
 	imageData, err := ioutil.ReadFile(filepath)
-	
-	require.NotEmpty(t, imageData)
-	require.NoError(t, err)
-
 	base64Image := base64.StdEncoding.EncodeToString(imageData)
-
-	require.NotEmpty(t, base64Image)
 
 	return base64Image
 }
@@ -37,6 +31,19 @@ func insertImage(t *testing.T) Image {
 		Link: "www.example.com",
 		Image64: exampleImage1,
 	}
+
+	ctx := context.Background()
+	image, err := testImageQueries.InsertImage(ctx, arg)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, image)
+
+	require.Equal(t, arg.AccountID, image.AccountID)
+	require.Equal(t, arg.Text, image.Text)
+	require.Equal(t, arg.Link, image.Link)
+	require.Equal(t, arg.Image64, image.Image64)
+
+	return image
 }
 
 func TestInsertImage(t *testing.T) {

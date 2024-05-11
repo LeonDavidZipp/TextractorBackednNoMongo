@@ -21,14 +21,14 @@ type InsertImageParams struct {
 // TODO: implement not for Store but for Mongo "Queries"
 func (q *MongoQueries) InsertImage(ctx context.Context, arg InsertImageParams) (Image, error) {
 	collection := q.db.Collection("images")
-	inserted, err := collection.insertOne(ctx, arg)
+	inserted, err := collection.InsertOne(ctx, arg)
 
 	if err != nil {
 		return Image{}, fmt.Errorf("Could not insert image: %w", err)
 	}
 
 	image := Image{
-		ID:        inserted.imageID,
+		ID:        inserted.imageID.(primitive.ObjectID),
 		AccountID: arg.AccountID,
 		Text:      arg.Text,
 		Link:      arg.Link,
