@@ -74,9 +74,19 @@ type UpdateImageParams struct {
 
 func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
 	collection := store.ImageDB.Collection("images")
-	filter := bson.M("_id": arg.ImageID)
+	filter := bson.M{"_id": arg.ImageID}
+	update := bson.M{
+		"$set": bson.M{
+			"text": arg.Text,
+			"image64": arg.Image64
+		}
+	}
+	options := {returnDocument: "after"}
 
-	image, err := collection.updateOne(ctx, filter, arg)
+	result, err := collection.FindOneAndUpdate(ctx,
+		filter,
+		update,
+		options)
 	if err != nil {
 		return fmt.Errorf("Could not update image: %w", err)
 	}
