@@ -24,6 +24,9 @@ services:
             - "5432:5432"
         volumes:
             - user-data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER=userdb_user
+            - POSTGRES_PASSWORD=test1234
 
     mongo-db:
         image: mongo

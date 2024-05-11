@@ -8,12 +8,12 @@ BEGIN
     END IF;
 END
 $$;
-CREATE ROLE userdb_user WITH LOGIN PASSWORD 'userdb_user';
+CREATE ROLE userdb_user WITH LOGIN PASSWORD 'test1234';
 DROP DATABASE IF EXISTS userdb;
 CREATE DATABASE userdb;
 GRANT ALL PRIVILEGES ON DATABASE userdb TO userdb_user;
 
-CREATE TABLE "accounts" (
+CREATE TABLE IF NOT EXISTS "accounts" (
   "id" BIGSERIAL PRIMARY KEY,
   "owner" varchar NOT NULL,
   "email" varchar NOT NULL,

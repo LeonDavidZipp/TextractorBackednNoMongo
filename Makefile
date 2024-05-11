@@ -25,19 +25,18 @@ startdb:
 
 # creates fresh database && tables in already running db container
 createdb:
-# docker-compose exec db createdb -U exampleuser $(POSTGRES_DB_NAME)
-	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose up
+	docker-compose exec db createdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
 
 dropdb:
-	docker-compose exec db dropdb -U exampleuser $(POSTGRES_DB_NAME)
+	docker-compose exec db dropdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
+
+resetdb: dropdb createdb migrateup
 
 migrateup:
-	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)"" -verbose up
+	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose up
 
 migratedown:
 	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose down
-
-restartdb: dropdb createdb migrateup
 
 dbcmd:
 	docker-compose exec db psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
@@ -46,7 +45,7 @@ dbcmd:
 startmongo:
 	docker-compose up mongo-db
 
-createmongo
+# createmongo
 
 #############################################################################################################################################################################
 #																																											#
