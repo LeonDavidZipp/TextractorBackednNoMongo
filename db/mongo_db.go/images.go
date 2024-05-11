@@ -93,3 +93,13 @@ type ListImagesParams struct {
 func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image, error) {
 
 }
+
+type DeleteImagesParams struct {
+	AccountIDs []int64 `bson:"account_ids" json:"account_ids"`
+	Amount     int32 `bson:"amount" json:"amount"`
+	Offset     int32 `bson:"offset" json:"offset"`
+}
+
+func (q *MongoQueries) DeleteImages(ctx context.Context, arg ListParams) ([]Image, error) {
+
+}
