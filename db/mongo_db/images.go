@@ -81,7 +81,6 @@ func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image,
 type UpdateImageParams struct {
 	ImageID   primitive.ObjectID `bson:"image_id" json:"image_id"`
 	Text      string             `bson:"text" json:"text"`
-	Image64   string             `bson:"image_64" json:"image_64"`
 }
 
 func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
@@ -90,7 +89,6 @@ func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (
 	update := bson.M{
 		"$set": bson.M{
 			"text": arg.Text,
-			"image64": arg.Image64
 		}
 	}
 	findOptions := {returnDocument: "after"}
