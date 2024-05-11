@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mongodb "go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 
@@ -81,16 +82,22 @@ func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (
 			"image64": arg.Image64
 		}
 	}
-	options := {returnDocument: "after"}
+	findOptions := {returnDocument: "after"}
 
 	result, err := collection.FindOneAndUpdate(ctx,
 		filter,
 		update,
-		options)
+		findOptions,
+	)
 	if err != nil {
 		return fmt.Errorf("Could not update image: %w", err)
 	}
 
+	var image Image
+	err := result.Decode(&image)
+	if err != nil {
+		return Image{}, err
+	}
 	return image, nil
 }
 
@@ -101,15 +108,41 @@ type ListImagesParams struct {
 }
 
 func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image, error) {
+	collection := q.db.Collection("images")
+	filter := bson.M{"account_id": arg.AccountID}
 
+	findOptions := options.Find()
+	findOptions.SetLimit(arg.Limit)
+	findOptions.SetSkip(arg.Offset)
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		return nil, fmt.Errorf("Could not list images: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var images []Image
+	if err = cursor.All(ctx, &images); err != nil {
+		return nil, fmt.Errorf("Could not decode images: %w", err)
+	}
+
+	return images, nil
 }
 
 type DeleteImagesParams struct {
-	AccountIDs []int64 `bson:"account_ids" json:"account_ids"`
-	Amount     int32 `bson:"amount" json:"amount"`
-	Offset     int32 `bson:"offset" json:"offset"`
+	IDs    []int64 `bson:"ids" json:"ids"`
+	Amount int32   `bson:"amount" json:"amount"`
+	Offset int32   `bson:"offset" json:"offset"`
 }
 
-func (q *MongoQueries) DeleteImages(ctx context.Context, arg ListParams) ([]Image, error) {
+func (q *MongoQueries) DeleteImages(ctx context.Context, arg DeleteImagesParams) error {
+	collection := q.db.Collection("images")
+	filter := bson.M{"_id": bson.M{"$in": arg.IDs}}
 
+	_, err := collection.DeleteMany(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("Could not delete images: %w", err)
+	}
+
+	return nil
 }
