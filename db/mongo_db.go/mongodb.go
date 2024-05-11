@@ -14,7 +14,7 @@ type MongoDBTX interface {
 	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (*mongo.DeleteResult, error)
 }
 
-func New(db MongoDBTX) *MongoQueries {
+func NewMongo(db MongoDBTX) *MongoQueries {
 	return &MongoQueries{db: db}
 }
 

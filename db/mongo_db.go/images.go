@@ -19,7 +19,7 @@ type InsertImageParams struct {
 
 // InsertImage inserts a new image into the database
 // TODO: implement not for Store but for Mongo "Queries"
-func (store *Store) InsertImage(
+func (q *MongoQueries) InsertImage(
 	ctx context.Context,
 	arg InsertImageParams
 ) (Image, error) {
@@ -42,7 +42,7 @@ func (store *Store) InsertImage(
 	return image, nil
 }
 
-func (store *Store) FindImage(ctx context.Context, id primitive.ObjectID) (Image, error) {
+func (q *MongoQueries) FindImage(ctx context.Context, id primitive.ObjectID) (Image, error) {
 	collection := store.ImageDB.Collection("images")
 	filter := bson.M{"_id": id}
 
@@ -54,7 +54,7 @@ func (store *Store) FindImage(ctx context.Context, id primitive.ObjectID) (Image
 	return image, nil
 }
 
-func (store *Store) DeleteImage(ctx context.Context, id primitive.ObjectID) error {
+func (q *MongoQueries) DeleteImage(ctx context.Context, id primitive.ObjectID) error {
 	collection := store.ImageDB.Collection("images")
 	filter := bson.M{"_id": id}
 
@@ -72,7 +72,7 @@ type UpdateImageParams struct {
 	Image64   string             `bson:"image_64" json:"image_64"`
 }
 
-func (store *Store) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
+func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
 	collection := store.ImageDB.Collection("images")
 	filter := bson.M("_id": arg.ImageID)
 

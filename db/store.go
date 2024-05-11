@@ -9,15 +9,23 @@ import (
 )
 
 
-type Store struct {
+type Store interface {
 	Querier
+	MongoQuerier
+	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult
+}
+
+type SQLMongoStore struct {
+	Querier
+	MongoQuerier
 	UserDB *sql.DB
 	ImageDB *mongodb.Database
 }
 
-func NewStore(userDB *sql.DB, imageDB *mongodb.Database) *Store {
-	return &Store{
+func NewStore(userDB *sql.DB, imageDB *mongodb.Database) Store {
+	return &SQLMongoStore{
 		Querier: New(userDB),
+		MongoQuerier: NewMongo(imageDB),
 		UserDB: userDB,
 		ImageDB: imageDB,
 	}
@@ -31,12 +39,12 @@ type UploadImageTransactionParams struct {
 }
 
 type UploadImageTransactionResult struct {
-	Text     string  `json:"text"`
+	Image    Image   `json:"image"`
 	Uploader Account `json:"uploader"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
-func (store *Store) UploadImage(
+func (store *Store) UploadImageTransaction(
 	ctx context.Context,
 	arg UploadImageTransactionParams
 ) UploadImageTransactionResult {
