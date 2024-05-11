@@ -83,3 +83,13 @@ func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (
 
 	return image, nil
 }
+
+type ListImagesParams struct {
+	AccountID int64 `bson:"account_id" json:"account_id"`
+	Amount    int32 `bson:"amount" json:"amount"`
+	Offset    int32 `bson:"offset" json:"offset"`
+}
+
+func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image, error) {
+
+}
