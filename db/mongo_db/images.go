@@ -3,7 +3,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	mongodb "go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -52,16 +52,32 @@ func (q *MongoQueries) FindImage(ctx context.Context, id primitive.ObjectID) (Im
 	return image, nil
 }
 
-func (q *MongoQueries) DeleteImage(ctx context.Context, id primitive.ObjectID) error {
-	collection := q.db.Collection("images")
-	filter := bson.M{"_id": id}
+type ListImagesParams struct {
+	AccountID int64 `bson:"account_id" json:"account_id"`
+	Amount    int32 `bson:"amount" json:"amount"`
+	Offset    int32 `bson:"offset" json:"offset"`
+}
 
-	_, err := collection.DeleteOne(ctx, filter)
+func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image, error) {
+	collection := q.db.Collection("images")
+	filter := bson.M{"account_id": arg.AccountID}
+
+	findOptions := options.Find()
+	findOptions.SetLimit(arg.Limit)
+	findOptions.SetSkip(arg.Offset)
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
 	if err != nil {
-		return fmt.Errorf("Could not delete image: %w", err)
+		return nil, fmt.Errorf("Could not list images: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var images []Image
+	if err = cursor.All(ctx, &images); err != nil {
+		return nil, fmt.Errorf("Could not decode images: %w", err)
 	}
 
-	return nil
+	return images, nil
 }
 
 type UpdateImageParams struct {
@@ -98,32 +114,16 @@ func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (
 	return image, nil
 }
 
-type ListImagesParams struct {
-	AccountID int64 `bson:"account_id" json:"account_id"`
-	Amount    int32 `bson:"amount" json:"amount"`
-	Offset    int32 `bson:"offset" json:"offset"`
-}
-
-func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image, error) {
+func (q *MongoQueries) DeleteImage(ctx context.Context, id primitive.ObjectID) error {
 	collection := q.db.Collection("images")
-	filter := bson.M{"account_id": arg.AccountID}
+	filter := bson.M{"_id": id}
 
-	findOptions := options.Find()
-	findOptions.SetLimit(arg.Limit)
-	findOptions.SetSkip(arg.Offset)
-
-	cursor, err := collection.Find(ctx, filter, findOptions)
+	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("Could not list images: %w", err)
-	}
-	defer cursor.Close(ctx)
-
-	var images []Image
-	if err = cursor.All(ctx, &images); err != nil {
-		return nil, fmt.Errorf("Could not decode images: %w", err)
+		return fmt.Errorf("Could not delete image: %w", err)
 	}
 
-	return images, nil
+	return nil
 }
 
 type DeleteImagesParams struct {
