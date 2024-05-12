@@ -89,7 +89,7 @@ func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (
 	update := bson.M{
 		"$set": bson.M{
 			"text": arg.Text,
-		}
+		},
 	}
 	findOptions := {returnDocument: "after"}
 

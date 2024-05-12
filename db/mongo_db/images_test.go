@@ -20,10 +20,10 @@ func encodeImageToBase64(filepath string) string {
 	return base64Image
 }
 
-exampleImage1 := encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
-exampleImage2 := encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/text.png")
+var exampleImage1 string
 
 func insertImage(t *testing.T, image64 string, accountID int64) Image {
+	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
 	arg := InsertImageParams{
 		AccountID: accountID,
 		Text: RandomString(100),
@@ -50,6 +50,7 @@ func TestInsertImage(t *testing.T) {
 }
 
 func TestFindImage(t *testing.T) {
+	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
 	image1 := insertImage(t, exampleImage1, 1)
 	image2, err := FindImage(ctx, image1.ID)
 
@@ -63,6 +64,7 @@ func TestFindImage(t *testing.T) {
 }
 
 func TestListImages(t *testing.T) {
+	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
 	for i := 0; i < 10; i++ {
 		insertImage(t, exampleImage1, 1)
 	}
@@ -85,6 +87,7 @@ func TestListImages(t *testing.T) {
 }
 
 func TestUpdateImage(t *testing.T) {
+	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
 	image1 := insertImage(t, exampleImage1, 1)
 	arg := UpdateImageParams{
 		ID: image1.ID,

@@ -44,20 +44,12 @@ type UploadImageTransactionResult struct {
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
-func (store *Store) UploadImageTransaction(
-	ctx context.Context,
-	arg UploadImageTransactionParams
-) UploadImageTransactionResult {
+func (store *Store) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult {
 	err := store.execTransaction(ctx, arg.Filepath, UploadToPostgres, UploadToMongo)
 }
 
 // Uploads the data to postgres accounts table
-func (store *Store) uploadToPostgres(
-	ctx context.Context,
-	querie *Queries,
-	AccountID int64,
-	result *UploadImageTransactionResult
-	) error {
+func (store *Store) uploadToPostgres(ctx context.Context, querie *Queries, AccountID int64, result *UploadImageTransactionResult) error {
 	result.Uploader, err := querie.UpdateImageCount(ctx, UpdateImageCountParams{
 		Amount: 1,
 		ID: arg.AccountID,
@@ -107,7 +99,7 @@ func (store *Store) execTransaction(
 	// mongodb
 	session, err := store.ImageDBClient.StartSession()
 	if err != nil {
-		if rollbackErr := sqlTransaction.Rollback(), rollbackErr != nil {
+		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
 		}
 		return err
@@ -116,7 +108,7 @@ func (store *Store) execTransaction(
 
 	err = session.StartTransaction()
 	if err != nil {
-		if rollbackErr := sqlTransaction.Rollback(), rollbackErr != nil {
+		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
 		}
 		return err
@@ -127,7 +119,7 @@ func (store *Store) execTransaction(
 		return fnMongo(sessionContext, arg) // Pass file path to fnMongo
 	})
 	if er != nil {
-		if rollbackErr := sqlTransaction.Rollback(), rollbackErr != nil {
+		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
 		}
 		return err

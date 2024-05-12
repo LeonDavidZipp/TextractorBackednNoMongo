@@ -3,7 +3,12 @@ package main
 import (
 	"database/sql"
 	"log"
-	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	"context"
+	"time"
+	util "github.com/LeonDavidZipp/Textractor/util"
+	db "github.com/LeonDavidZipp/Textractor/db"
+	"github.com/LeonDavidZipp/Textractor/db/sqlc"
+	"github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
