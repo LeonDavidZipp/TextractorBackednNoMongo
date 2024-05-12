@@ -40,23 +40,32 @@ type UploadImageTransactionParams struct {
 }
 
 type UploadImageTransactionResult struct {
-	Image    mongodb.Image   `json:"image"`
-	Uploader db.Account `json:"uploader"`
+	Image    mongodb.Image `json:"image"`
+	Uploader db.Account    `json:"uploader"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
 func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult {
 	var result UploadImageTransactionResult
 	
-	err := store.execTransaction(ctx, arg.Filepath, UploadToPostgres, UploadToMongo)
+	err := store.execTransaction(
+		ctx,
+		arg.Filepath,
+		func(q *Queries) error {
+			return uploadToPostgres(arg.AccountID, &result),
+			},
+		func(q *Queries) error {
+			return uploadToMongo(arg, &result),
+		},
+	)
 	if err != nil {
 		return UploadImageTransactionResult{}
 	}
 }
 
 // Uploads the data to postgres accounts table
-func (store *Store) uploadToPostgres(ctx context.Context, querie *Queries, AccountID int64, result *UploadImageTransactionResult) error {
-	result.Uploader, err := querie.UpdateImageCount(ctx, UpdateImageCountParams{
+func (store *Store) uploadToPostgres(AccountID int64, result *UploadImageTransactionResult) error {
+	result.Uploader, err := store.UpdateImageCount(ctx, UpdateImageCountParams{
 		Amount: 1,
 		ID: arg.AccountID,
 	})
@@ -67,7 +76,7 @@ func (store *Store) uploadToPostgres(ctx context.Context, querie *Queries, Accou
 }
 
 // Uploads the image to mongodb table
-func (store *Store) uploadToMongo(mongoCtx mongo.SessionContext, arg UploadImageTransactionParams) error {
+func (store *Store) uploadToMongo(arg UploadImageTransactionParams, result *UploadImageTransactionResult) error {
 	mongoDB, err := store.ImageDBClient.Database()
 }
 
