@@ -4,28 +4,29 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	mongodb "go.mongodb.org/mongo-driver/mongo"
-	options "go.mongodb.org/mongo-driver/mongo/options"
+	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 
 type Store interface {
-	Querier
-	MongoQuerier
+	db.Querier
+	mongodb.MongoQuerier
 	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult
 }
 
 type SQLMongoStore struct {
-	Querier
-	MongoQuerier
+	*db.Queries
+	*mongodb.MongoQueries
 	UserDB *sql.DB
-	ImageDB *mongodb.Database
+	ImageDB *mongo.Database
 }
 
-func NewStore(userDB *sql.DB, imageDB *mongodb.Database) Store {
+func NewStore(userDB *sql.DB, imageDB *mongo.Database) Store {
 	return &SQLMongoStore{
-		Querier: New(userDB),
-		MongoQuerier: NewMongo(imageDB),
+		Queries: db.New(userDB),
+		MongoQueries: mongodb.NewMongo(imageDB),
 		UserDB: userDB,
 		ImageDB: imageDB,
 	}
@@ -39,13 +40,18 @@ type UploadImageTransactionParams struct {
 }
 
 type UploadImageTransactionResult struct {
-	Image    Image   `json:"image"`
-	Uploader Account `json:"uploader"`
+	Image    mongodb.Image   `json:"image"`
+	Uploader db.Account `json:"uploader"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
-func (store *Store) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult {
+func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult {
+	var result UploadImageTransactionResult
+	
 	err := store.execTransaction(ctx, arg.Filepath, UploadToPostgres, UploadToMongo)
+	if err != nil {
+		return UploadImageTransactionResult{}
+	}
 }
 
 // Uploads the data to postgres accounts table
@@ -61,10 +67,7 @@ func (store *Store) uploadToPostgres(ctx context.Context, querie *Queries, Accou
 }
 
 // Uploads the image to mongodb table
-func (store *Store) uploadToMongo(
-	mongoCtx mongo.SessionContext,
-	arg UploadImageTransactionParams
-	) error {
+func (store *Store) uploadToMongo(mongoCtx mongo.SessionContext, arg UploadImageTransactionParams) error {
 	mongoDB, err := store.ImageDBClient.Database()
 }
 
@@ -79,7 +82,7 @@ func (store *Store) execTransaction(
 	ctx context.Context,
 	arg UploadImageTransactionParams,
 	fnSql func(context.Context, *Queries, int64, *UploadImageTransactionResult) error,
-	fnMongo func(mongo.SessionContext, string, string) error
+	fnMongo func(mongo.SessionContext, string, string) error,
 	) error {
 	// postgres
 	sqlTransaction, err := store.UserDB.BeginTx(ctx, nil)
@@ -90,7 +93,7 @@ func (store *Store) execTransaction(
 	sqlQuerie := New(sqlTransaction)
 	err = fnSql(sqlQuerie, arg.AccountID)
 	if err != nil {
-		if rollbackErr := sqlTransaction.Rollback(), rollbackErr != nil {
+		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
 		}
 		return err
@@ -130,9 +133,5 @@ func (store *Store) execTransaction(
 	if err != nil {
 		return err
 	}
-	err = session.CommitTransaction(ctx)
-	if err != nil {
-		return err
-	}
-	return nil 
+	return session.CommitTransaction(ctx)
 }

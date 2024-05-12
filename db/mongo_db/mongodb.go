@@ -1,7 +1,7 @@
 package db
 
 import (
-	"context"
+	// "context"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -26,8 +26,8 @@ type MongoQueries struct {
 	db MongoDBTX
 }
 
-func (q *MongoQueries) WithTx(tx *mongo.Client) *MongoQueries {
-	return &MongoQueries{
-		db: tx,
-	}
-}
+// func (q *MongoQueries) WithTx(tx *mongo.Client) *MongoQueries {
+// 	return &MongoQueries{
+// 		db: tx,
+// 	}
+// }

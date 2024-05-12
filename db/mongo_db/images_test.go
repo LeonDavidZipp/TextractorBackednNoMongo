@@ -82,7 +82,7 @@ func TestListImages(t *testing.T) {
 	require.Len(t, images, 5)
 
 	for _, image := range images {
-		require,NotEmpty(t, image)
+		require.NotEmpty(t, image)
 	}
 }
 

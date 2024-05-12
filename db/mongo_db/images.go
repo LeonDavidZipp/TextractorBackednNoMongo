@@ -3,9 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
@@ -28,7 +28,7 @@ func (q *MongoQueries) InsertImage(ctx context.Context, arg InsertImageParams) (
 	}
 
 	image := Image{
-		ID:        inserted.imageID.(primitive.ObjectID),
+		ID:        inserted.InsertedID.(primitive.ObjectID),
 		AccountID: arg.AccountID,
 		Text:      arg.Text,
 		Link:      arg.Link,
@@ -43,7 +43,7 @@ func (q *MongoQueries) FindImage(ctx context.Context, id primitive.ObjectID) (Im
 	filter := bson.M{"_id": id}
 
 	var image Image
-	image, err := collection.FindOne(ctx, filter).Decode(&image)
+	err := collection.FindOne(ctx, filter).Decode(&image)
 	if err != nil {
 		return Image{}, fmt.Errorf("Could not find image: %w", err)
 	}
@@ -52,11 +52,11 @@ func (q *MongoQueries) FindImage(ctx context.Context, id primitive.ObjectID) (Im
 
 type ListImagesParams struct {
 	AccountID int64 `bson:"account_id" json:"account_id"`
-	Amount    int32 `bson:"amount" json:"amount"`
-	Offset    int32 `bson:"offset" json:"offset"`
+	Limit     int64 `bson:"amount" json:"amount"`
+	Offset    int64 `bson:"offset" json:"offset"`
 }
 
-func (q *MongoQueries) ListImages(ctx context.Context, arg ListParams) ([]Image, error) {
+func (q *MongoQueries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error) {
 	collection := q.db.Collection("images")
 	filter := bson.M{"account_id": arg.AccountID}
 
@@ -91,16 +91,13 @@ func (q *MongoQueries) UpdateImage(ctx context.Context, arg UpdateImageParams) (
 			"text": arg.Text,
 		},
 	}
-	findOptions := {returnDocument: "after"}
+	findOptions := options.FindOneAndUpdate().SetReturnDocument(options.After)
 
-	result, err := collection.FindOneAndUpdate(ctx,
+	result := collection.FindOneAndUpdate(ctx,
 		filter,
 		update,
 		findOptions,
 	)
-	if err != nil {
-		return fmt.Errorf("Could not update image: %w", err)
-	}
 
 	var image Image
 	err := result.Decode(&image)
