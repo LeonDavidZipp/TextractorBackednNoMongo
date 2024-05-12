@@ -39,7 +39,7 @@ services:
             - image-data:/data/db
 
     # auth:
-    #   image: "keycloak:latest"
+    #   image: keycloak:latest
     #   restart: always
     #   expose:
     #       - 8081

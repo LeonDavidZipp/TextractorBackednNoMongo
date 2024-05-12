@@ -6,7 +6,7 @@ import (
 )
 
 
-type MongoQuerier interface {
+type MongoOperator interface {
 	InsertImage(ctx context.Context, arg InsertImageParams) (Image, error)
 	FindImage(ctx context.Context, id primitive.ObjectID) (Image, error)
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
@@ -15,4 +15,4 @@ type MongoQuerier interface {
 	DeleteImages(ctx context.Context, arg DeleteImagesParams) error
 }
 
-var _ MongoQuerier = (*MongoQueries)(nil)
+var _ MongoOperator = (*MongoOperations)(nil)

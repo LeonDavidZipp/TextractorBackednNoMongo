@@ -2,6 +2,7 @@ package db
 
 import (
 	_ "github.com/lib/pq"
+	"context"
 	"os"
 	"log"
 	"testing"
@@ -12,7 +13,7 @@ import (
 )
 
 
-var testImageQueries *MongoQueries
+var testImageQueries *MongoOperations
 var testImageDB *mongo.Database
 
 func TestMain(m *testing.M) {
@@ -21,6 +22,8 @@ func TestMain(m *testing.M) {
 		log.Fatal("Cannot load config:", err)
 	}
 
+	ctx := context.Background()
+
 	optionsClient := options.Client().ApplyURI(config.MongoSource)
 	mongoClient, err := mongo.Connect(ctx, optionsClient)
 	if err != nil {
@@ -28,8 +31,8 @@ func TestMain(m *testing.M) {
 	}
 	defer mongoClient.Disconnect(ctx)
 
-	testImageDB := mongoClient.Database(config.MongoDBName)
-	err := testImageDB.Client().Ping(ctx, nil)
+	testImageDB = mongoClient.Database(config.MongoDBName)
+	err = testImageDB.Client().Ping(ctx, nil)
 	if err != nil {
 		log.Fatal("Image DB not reachable:", err)
 	}
