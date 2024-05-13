@@ -30,7 +30,7 @@ type MongoDatabase interface {
 
 func NewMongo(db MongoDatabase) *MongoOperations {
 	return &MongoOperations{
-		se: se,
+		db: db,
 	}
 }
 

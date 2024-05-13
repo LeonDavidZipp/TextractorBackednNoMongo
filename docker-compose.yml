@@ -2,13 +2,13 @@ services:
     app:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.backend
             target: dev # target stage to build, CHANGE to prod for production
         restart: unless-stopped
         expose:
-            - 8080
+            - ${BACKEND_PORT}
         ports:
-            - "8080:8080"
+            - "${BACKEND_PORT}:${BACKEND_PORT}"
         depends_on:
             - db
             - mongo-db
@@ -25,11 +25,13 @@ services:
         volumes:
             - user-data:/var/lib/postgresql/data
         environment:
-            - POSTGRES_USER=userdb_user
-            - POSTGRES_PASSWORD=test1234
+          - POSTGRES_USER=${POSTGRES_USER}
+          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
     mongo-db:
-        image: mongo
+        build:
+            context: .
+            dockerfile: Dockerfile.mongodb
         restart: unless-stopped
         expose:
             - 27017
@@ -37,6 +39,7 @@ services:
             - "27017:27017"
         volumes:
             - image-data:/data/db
+            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
     # auth:
     #   image: keycloak:latest

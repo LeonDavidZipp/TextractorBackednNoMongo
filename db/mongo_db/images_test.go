@@ -6,7 +6,7 @@ import (
 	// "os"
 	"encoding/base64"
 	"io/ioutil"
-	"go.mongodb.org/mongo-driver/mongo"
+	// "go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/LeonDavidZipp/Textractor/util"
 	"testing"

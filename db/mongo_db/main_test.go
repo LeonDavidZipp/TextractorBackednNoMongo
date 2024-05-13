@@ -37,8 +37,6 @@ func TestMain(m *testing.M) {
 		log.Fatal("Image DB not reachable:", err)
 	}
 
-	testSession
-
 	testImageOperations = NewMongo(testImageDB)
 
 	os.Exit(m.Run())

@@ -25,7 +25,6 @@ type SQLMongoStore struct {
 
 func NewStore(
 	userDB *sql.DB,
-	session *mongo.Session,
 	imageDB *mongo.Database) Store {
 	return &SQLMongoStore{
 		Queries: db.New(userDB),
@@ -114,7 +113,6 @@ func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg Uplo
 	
 	err := store.execTransaction(
 		ctx,
-		arg,
 		func(q *db.Queries) error {
 			var err error
 			result.Uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{

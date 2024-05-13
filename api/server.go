@@ -4,7 +4,9 @@ package api
 // 	"database/sql"
 // 	"net/http"
 // 	"github.com/gin-gonic/gin"
-// 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+// 	db "github.com/LeonDavidZipp/Textractor/db"
+// 	sqldb "github.com/LeonDavidZipp/Textractor/db/sqlc"
+// 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 // )
 
 
@@ -24,13 +26,13 @@ package api
 // 	router.POST("/accounts", server.createAccount)
 // 	router.GET("/accounts/:id", server.getAccount)
 // 	router.GET("accounts", server.listAccounts)
-// 	// router.DELETE("/accounts/:id", server.deleteAccount)
+// 	router.DELETE("/accounts/:id", server.deleteAccount)
 	
 // 	// Images (Mongo)
-// 	// router.POST("/accounts", server.uploadAccount)
-// 	// router.GET("/accounts/images/:id", server.getAccount)
-// 	// router.GET("accounts/images", server.listAccounts)
-// 	// router.DELETE("/accounts/images/:id", server.deleteImage)
+// 	router.POST("/accounts", server.uploadAccount)
+// 	router.GET("/accounts/images/:id", server.getAccount)
+// 	router.GET("accounts/images", server.listAccounts)
+// 	router.DELETE("/accounts/images/:id", server.deleteImage)
 
 // 	server.router = router
 
