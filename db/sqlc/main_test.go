@@ -13,14 +13,10 @@ var testAccountQueries *Queries
 var testAccountDB *sql.DB
 
 func TestMain(m *testing.M) {
-	config, err := util.LoadConfig("../..")
 	testAccountDB, err = sql.Open(
-		config.DBDriver,
-		config.DBSource,
+		os.getenv("POSTGRES_DRIVER"),
+		os.getenv("POSTGRES_SOURCE"),
 	)
-	if err != nil {
-		log.Fatal("Cannot connect to User DB:", err)
-	}
 
 	testAccountQueries = New(testAccountDB)
 

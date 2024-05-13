@@ -17,21 +17,16 @@ var testImageDB *mongo.Database
 var testSession mongo.Session
 
 func TestMain(m *testing.M) {
-	config, err := util.LoadConfig("../..")
-	if err != nil {
-		log.Fatal("Cannot load config:", err)
-	}
-
 	ctx := context.Background()
 
-	optionsClient := options.Client().ApplyURI(config.MongoSource)
+	optionsClient := options.Client().ApplyURI(os.getenv("MONGO_SOURCE"))
 	mongoClient, err := mongo.Connect(ctx, optionsClient)
 	if err != nil {
 		log.Fatal("Cannot connect to Image DB:", err)
 	}
 	defer mongoClient.Disconnect(ctx)
 
-	testImageDB = mongoClient.Database(config.MongoDBName)
+	testImageDB = mongoClient.Database(os.getenv("MONGO_DB_NAME"))
 	err = testImageDB.Client().Ping(ctx, nil)
 	if err != nil {
 		log.Fatal("Image DB not reachable:", err)

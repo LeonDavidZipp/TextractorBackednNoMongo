@@ -1,4 +1,4 @@
-include app.env
+include .env
 
 .PHONY: start startapp startdb createdb migrateup migratedown restartdb dropdb runcmd sqlc test get imagebuild imagerebuild tour server
 
