@@ -12,7 +12,7 @@ type MongoOperator interface {
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
 	UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error)
 	DeleteImage(ctx context.Context, id primitive.ObjectID) error
-	DeleteImages(ctx context.Context, arg DeleteImagesParams) error
+	DeleteImages(ctx context.Context, ids []primitive.ObjectID) error
 }
 
 var _ MongoOperator = (*MongoOperations)(nil)

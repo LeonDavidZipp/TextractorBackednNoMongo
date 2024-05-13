@@ -20,7 +20,7 @@ type InsertImageParams struct {
 // InsertImage inserts a new image into the database
 // TODO: implement not for Store but for Mongo "Queries"
 func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParams) (Image, error) {
-	inserted, err := op.db.InsertOne(ctx, arg)
+	inserted, err := op.db.Collection("imagedb").InsertOne(ctx, arg)
 
 	if err != nil {
 		return Image{}, fmt.Errorf("Could not insert image: %w", err)
@@ -41,7 +41,7 @@ func (op *MongoOperations) FindImage(ctx context.Context, id primitive.ObjectID)
 	filter := bson.M{"_id": id}
 
 	var image Image
-	err := op.db.FindOne(ctx, filter).Decode(&image)
+	err := op.db.Collection("imagedb").FindOne(ctx, filter).Decode(&image)
 	if err != nil {
 		return Image{}, fmt.Errorf("Could not find image: %w", err)
 	}
@@ -61,7 +61,7 @@ func (op *MongoOperations) ListImages(ctx context.Context, arg ListImagesParams)
 	findOptions.SetLimit(arg.Limit)
 	findOptions.SetSkip(arg.Offset)
 
-	cursor, err := op.db.Find(ctx, filter, findOptions)
+	cursor, err := op.db.Collection("imagedb").Find(ctx, filter, findOptions)
 	if err != nil {
 		return nil, fmt.Errorf("Could not list images: %w", err)
 	}
@@ -89,7 +89,7 @@ func (op *MongoOperations) UpdateImage(ctx context.Context, arg UpdateImageParam
 	}
 	findOptions := options.FindOneAndUpdate().SetReturnDocument(options.After)
 
-	result := op.db.FindOneAndUpdate(ctx,
+	result := op.db.Collection("imagedb").FindOneAndUpdate(ctx,
 		filter,
 		update,
 		findOptions,
@@ -106,7 +106,7 @@ func (op *MongoOperations) UpdateImage(ctx context.Context, arg UpdateImageParam
 func (op *MongoOperations) DeleteImage(ctx context.Context, id primitive.ObjectID) error {
 	filter := bson.M{"_id": id}
 
-	_, err := op.db.DeleteOne(ctx, filter)
+	_, err := op.db.Collection("imagedb").DeleteOne(ctx, filter)
 	if err != nil {
 		return fmt.Errorf("Could not delete image: %w", err)
 	}
@@ -114,16 +114,10 @@ func (op *MongoOperations) DeleteImage(ctx context.Context, id primitive.ObjectI
 	return nil
 }
 
-type DeleteImagesParams struct {
-	IDs    []int64 `bson:"ids" json:"ids"`
-	Amount int32   `bson:"amount" json:"amount"`
-	Offset int32   `bson:"offset" json:"offset"`
-}
+func (op *MongoOperations) DeleteImages(ctx context.Context, ids []primitive.ObjectID) error {
+	filter := bson.M{"_id": bson.M{"$in": ids}}
 
-func (op *MongoOperations) DeleteImages(ctx context.Context, arg DeleteImagesParams) error {
-	filter := bson.M{"_id": bson.M{"$in": arg.IDs}}
-
-	_, err := op.db.DeleteMany(ctx, filter)
+	_, err := op.db.Collection("imagedb").DeleteMany(ctx, filter)
 	if err != nil {
 		return fmt.Errorf("Could not delete images: %w", err)
 	}

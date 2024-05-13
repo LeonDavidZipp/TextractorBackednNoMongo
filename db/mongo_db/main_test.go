@@ -8,13 +8,13 @@ import (
 	"testing"
 	"github.com/LeonDavidZipp/Textractor/util"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 
 var testImageOperations *MongoOperations
 var testImageDB *mongo.Database
+var testSession mongo.Session
 
 func TestMain(m *testing.M) {
 	config, err := util.LoadConfig("../..")
@@ -36,6 +36,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal("Image DB not reachable:", err)
 	}
+
+	testSession
 
 	testImageOperations = NewMongo(testImageDB)
 

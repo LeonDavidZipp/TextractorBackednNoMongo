@@ -1,17 +1,17 @@
 -- Use to initialize empty DB and tables OR reset DB and tables
 
-DO
-$$
-BEGIN
-    IF EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'userdb_user') THEN
-        DROP ROLE userdb_user;
-    END IF;
-END
-$$;
-CREATE ROLE userdb_user WITH LOGIN PASSWORD 'test1234';
-DROP DATABASE IF EXISTS userdb;
-CREATE DATABASE userdb;
-GRANT ALL PRIVILEGES ON DATABASE userdb TO userdb_user;
+-- DO
+-- $$
+-- BEGIN
+--     IF EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'userdb_user') THEN
+--         DROP ROLE userdb_user;
+--     END IF;
+-- END
+-- $$;
+-- CREATE ROLE userdb_user WITH LOGIN PASSWORD 'test1234';
+-- DROP DATABASE IF EXISTS userdb;
+-- CREATE DATABASE userdb;
+-- GRANT ALL PRIVILEGES ON DATABASE userdb TO userdb_user;
 
 CREATE TABLE IF NOT EXISTS "accounts" (
   "id" BIGSERIAL PRIMARY KEY,

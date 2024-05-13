@@ -21,13 +21,15 @@ type SQLMongoStore struct {
 	*mongodb.MongoOperations
 	UserDB       *sql.DB
 	ImageDB      *mongo.Database
-	MongoSession *mongo.Session
 }
 
-func NewStore(userDB *sql.DB, session *mongo.Session, imageDB *mongo.Database) Store {
+func NewStore(
+	userDB *sql.DB,
+	session *mongo.Session,
+	imageDB *mongo.Database) Store {
 	return &SQLMongoStore{
 		Queries: db.New(userDB),
-		MongoOperations: mongodb.NewMongo(session, imageDB),
+		MongoOperations: mongodb.NewMongo(imageDB),
 		UserDB: userDB,
 		ImageDB: imageDB,
 	}
@@ -124,7 +126,7 @@ func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg Uplo
 			}
 			return nil
 		},
-		func(op *MongoOperations) {
+		func(op *mongodb.MongoOperations) error {
 			var err error
 			result.Image, err = op.InsertImage(ctx, mongodb.InsertImageParams{
 				AccountID: arg.AccountID,
@@ -132,13 +134,14 @@ func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg Uplo
 				Link: arg.Link,
 				Image64: arg.Image64,
 			})
-	if err != nil {
-		return err
-	}
-	return nil
-		}
+			if err != nil {
+				return err
+			}
+			return nil
+		},
 	)
 	if err != nil {
 		return UploadImageTransactionResult{}
 	}
+	return result
 }

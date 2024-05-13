@@ -7,8 +7,7 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 	"go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/LeonDavidZipp/Textractor/util"
 	"testing"
 	"github.com/stretchr/testify/require"
@@ -23,6 +22,7 @@ func encodeImageToBase64(filepath string) string {
 }
 
 var exampleImage1 string
+var exampleImage2 string
 
 func insertImage(t *testing.T, image64 string, accountID int64) Image {
 	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
@@ -113,6 +113,7 @@ func TestUpdateImage(t *testing.T) {
 }
 
 func TestDeleteImage(t *testing.T) {
+	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
 	image1 := insertImage(t, exampleImage1, 1)
 
 	ctx := context.Background()
@@ -121,21 +122,23 @@ func TestDeleteImage(t *testing.T) {
 
 	image2, err := testImageOperations.FindImage(ctx, image1.ID)
 	require.Error(t, err)
-	// require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, image2)
 }
 
 func TestDeleteImages(t *testing.T) {
-	for i := 0; i < 10; i++ {
-		insertImage(t, exampleImage1, 1)
-	}
+	exampleImage1 = encodeImageToBase64("/Users/leon/Desktop/Textractor/db/mongo_db/sample.jpeg")
+	exampleImage2 = encodeImageToBase64("/Users/lzipp/Desktop/Textractor/Backend/db/mongo_db/text.png")
+	image1 := insertImage(t, exampleImage1, 1)
+	image2 := insertImage(t, exampleImage2, 1)
 
 	ctx := context.Background()
-	err := testImageOperations.DeleteImages(ctx, 1)
+	err := testImageOperations.DeleteImages(ctx, []primitive.ObjectID{image1.ID, image2.ID})
 	require.NoError(t, err)
 
-	images, err := testImageOperations.ListImages(ctx, ListImagesParams{AccountID: 1})
+	image1Del, err := testImageOperations.FindImage(ctx, image1.ID)
 	require.Error(t, err)
-	require.EqualError(t, err, mongo.ErrNoDocuments.Error())
-	require.Empty(t, images)
+	require.Empty(t, image1Del)
+	image2Del, err := testImageOperations.FindImage(ctx, image2.ID)
+	require.Error(t, err)
+	require.Empty(t, image2Del)
 }

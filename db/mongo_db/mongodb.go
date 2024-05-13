@@ -7,11 +7,13 @@ import (
 )
 
 
-type MongoDBSession interface {
-	StartTransaction(...*options.TransactionOptions) error
-	AbortTransaction(context.Context) error
-	CommitTransaction(context.Context) error
-}
+// type MongoSession interface {
+// 	EndSession(context.Context) error
+// 	StartTransaction(...*options.TransactionOptions) error
+// 	AbortTransaction(context.Context) error
+// 	CommitTransaction(context.Context) error
+// 	WithTransaction(context.Context, func(mongo.SessionContext) error) error
+// }
 
 type MongoDBCollection interface {
 	InsertOne(context.Context, interface{}, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
@@ -22,14 +24,16 @@ type MongoDBCollection interface {
 	DeleteMany(context.Context, interface{}, ...*options.DeleteOptions) (*mongo.DeleteResult, error)
 }
 
-func NewMongo(se MongoDBSession, db MongoDBCollection) *MongoOperations {
+type MongoDatabase interface {
+	Collection(name string, opts ...*options.CollectionOptions) *mongo.Collection
+}
+
+func NewMongo(db MongoDatabase) *MongoOperations {
 	return &MongoOperations{
 		se: se,
-		db: db,
 	}
 }
 
 type MongoOperations struct {
-	se MongoDBSession
-	db MongoDBCollection
+	db MongoDatabase
 }
