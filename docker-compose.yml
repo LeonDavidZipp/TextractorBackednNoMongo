@@ -4,7 +4,7 @@ services:
             context: .
             dockerfile: Dockerfile
             target: dev # target stage to build, CHANGE to prod for production
-        restart: always
+        restart: unless-stopped
         expose:
             - 8080
         ports:
@@ -17,7 +17,7 @@ services:
 
     db:
         image: "postgres:16.2-alpine3.19"
-        restart: always
+        restart: unless-stopped
         expose:
             - 5432
         ports:
@@ -30,7 +30,7 @@ services:
 
     mongo-db:
         image: mongo
-        restart: always
+        restart: unless-stopped
         expose:
             - 27017
         ports:
@@ -40,7 +40,7 @@ services:
 
     # auth:
     #   image: keycloak:latest
-    #   restart: always
+    #   restart: unless-stopped
     #   expose:
     #       - 8081
     #   ports:

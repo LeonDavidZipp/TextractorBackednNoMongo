@@ -38,106 +38,10 @@ type UploadImageTransactionResult struct {
 	Uploader db.Account    `json:"uploader"`
 }
 
-// Uploads the data to postgres accounts table
-func (store *SQLMongoStore) uploadToPostgres(ctx context.Context, accountID int64, result *UploadImageTransactionResult) error {
-	var err error
-	result.Uploader, err = store.UpdateImageCount(ctx, db.UpdateImageCountParams{
-		Amount: 1,
-		ID: accountID,
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Uploads the image to mongodb table
-func (store *SQLMongoStore) uploadToMongo(ctx context.Context, arg UploadImageTransactionParams, result *UploadImageTransactionResult) error {
-	var err error
-	result.Image, err = store.InsertImage(ctx, mongodb.InsertImageParams{
-		AccountID: arg.AccountID,
-		Text: arg.Text,
-		Link: arg.Link,
-		Image64: arg.Image64,
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// execTransaction creates a "rollback-able" transaction.
-// It takes as arguments
-// 	the context
-// 	the filepath to the file to upload
-// 	the transcribed text
-// 	a function uploading the account data to accounts postgresql table
-// 	a function uploading image to mongodb table
-// func (store *SQLMongoStore) execTransaction(
-// 	ctx context.Context,
-// 	arg UploadImageTransactionParams,
-// 	result *UploadImageTransactionResult,
-// 	fnSql func(context.Context, *db.Queries, int64, *UploadImageTransactionResult) error,
-// 	fnMongo func(context.Context, string, string, *UploadImageTransactionResult) error,
-// ) error {
-// 	// postgres
-// 	sqlTransaction, err := store.UserDB.BeginTx(ctx, nil)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	sqlQuerie := db.New(sqlTransaction)
-// 	err = fnSql(ctx, sqlQuerie, arg.AccountID, result)
-// 	if err != nil {
-// 		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-// 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
-// 		}
-// 		return err
-// 	}
-
-// 	// mongodb
-// 	session, err := store.ImageDB.Client().StartSession()
-// 	if err != nil {
-// 		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-// 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
-// 		}
-// 		return err
-// 	}
-// 	defer session.EndSession(ctx)
-
-// 	err = session.StartTransaction()
-// 	if err != nil {
-// 		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-// 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
-// 		}
-// 		return err
-// 	}
-
-// 	// TODO: move database into fnMongo, implement uploading image in fnMongo
-// 	err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
-// 		return fnMongo(ctx, arg, sessionContext, result)
-// 	})
-// 	if err != nil {
-// 		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-// 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
-// 		}
-// 		return err
-// 	}
-
-// 	// commit
-// 	err = sqlTransaction.Commit()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return session.CommitTransaction(ctx)
-// }
-
 func (store *SQLMongoStore) execTransaction(
 	ctx context.Context,
-	arg UploadImageTransactionParams,
-	result *UploadImageTransactionResult,
-	fnSql func(context.Context, *db.Queries) error,
-	fnMongo func(context.Context, arg ) error,
+	fnSql func(*db.Queries) error,
+	fnMongo func(*mongodb.MongoOperations) error,
 ) error {
 	// postgres
 	sqlTransaction, err := store.UserDB.BeginTx(ctx, nil)
@@ -146,7 +50,7 @@ func (store *SQLMongoStore) execTransaction(
 	}
 
 	sqlQuerie := db.New(sqlTransaction)
-	err = fnSql(ctx, sqlQuerie)
+	err = fnSql(sqlQuerie)
 	if err != nil {
 		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
 			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
@@ -164,24 +68,6 @@ func (store *SQLMongoStore) execTransaction(
 	}
 	defer session.EndSession(ctx)
 
-	// err = session.StartTransaction()
-	// if err != nil {
-	// 	if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-	// 		return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
-	// 	}
-	// 	return err
-	// }
-
-	// err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
-	// 	return fnMongo(ctx, arg)
-	// })
-	// if err != nil {
-	// 	if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-	// 		return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
-	// 	}
-	// 	return err
-	// }
-
 	err = mongo.WithSession(ctx, session, func(seCtx mongo.SessionContext) error {
 		err := session.StartTransaction()
 		if err != nil {
@@ -190,7 +76,13 @@ func (store *SQLMongoStore) execTransaction(
 			}
 			return err
 		}
-		err = fnMongo(ctx, arg)
+		if err != nil {
+			if rollbackErr := session.AbortTransaction(ctx); rollbackErr != nil {
+				return fmt.Errorf("mongo transaction err: %v; rollback err: %v", err, rollbackErr)
+			}
+			return err
+		}
+		return nil
 	})
 	if err != nil {
 		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
@@ -222,11 +114,29 @@ func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg Uplo
 		ctx,
 		arg,
 		func(q *db.Queries) error {
-			return store.uploadToPostgres(ctx, arg.AccountID, &result)
-			},
-		func(q *db.Queries) error {
-			return store.uploadToMongo(ctx, arg, &result)
+			var err error
+			result.Uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
+				Amount: 1,
+				ID: arg.AccountID,
+			})
+			if err != nil {
+				return err
+			}
+			return nil
 		},
+		func(op *MongoOperations) {
+			var err error
+			result.Image, err = op.InsertImage(ctx, mongodb.InsertImageParams{
+				AccountID: arg.AccountID,
+				Text: arg.Text,
+				Link: arg.Link,
+				Image64: arg.Image64,
+			})
+	if err != nil {
+		return err
+	}
+	return nil
+		}
 	)
 	if err != nil {
 		return UploadImageTransactionResult{}

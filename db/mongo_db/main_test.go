@@ -13,7 +13,7 @@ import (
 )
 
 
-var testImageQueries *MongoOperations
+var testImageOperations *MongoOperations
 var testImageDB *mongo.Database
 
 func TestMain(m *testing.M) {
@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("Image DB not reachable:", err)
 	}
 
-	testImageQueries = NewMongo(testImageDB)
+	testImageOperations = NewMongo(testImageDB)
 
 	os.Exit(m.Run())
 }

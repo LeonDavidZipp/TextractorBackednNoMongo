@@ -2,13 +2,13 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"os"
+	// "fmt"
+	// "os"
 	"encoding/base64"
 	"io/ioutil"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	// "go.mongodb.org/mongo-driver/bson"
+	// "go.mongodb.org/mongo-driver/mongo/options"
 	"github.com/LeonDavidZipp/Textractor/util"
 	"testing"
 	"github.com/stretchr/testify/require"
@@ -34,7 +34,7 @@ func insertImage(t *testing.T, image64 string, accountID int64) Image {
 	}
 
 	ctx := context.Background()
-	image, err := testImageQueries.InsertImage(ctx, arg)
+	image, err := testImageOperations.InsertImage(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, image)
@@ -56,7 +56,7 @@ func TestFindImage(t *testing.T) {
 	ctx := context.Background()
 
 	image1 := insertImage(t, exampleImage1, 1)
-	image2, err := FindImage(ctx, image1.ID)
+	image2, err := testImageOperations.FindImage(ctx, image1.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, image2)
@@ -80,7 +80,7 @@ func TestListImages(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	images, err := testImageQueries.ListImages(ctx, arg)
+	images, err := testImageOperations.ListImages(ctx, arg)
 
 	require.NoError(t, err)
 	require.Len(t, images, 5)
@@ -99,7 +99,7 @@ func TestUpdateImage(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	image2, err := testImageQueries.UpdateImage(ctx, arg)
+	image2, err := testImageOperations.UpdateImage(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, image2)
@@ -116,10 +116,10 @@ func TestDeleteImage(t *testing.T) {
 	image1 := insertImage(t, exampleImage1, 1)
 
 	ctx := context.Background()
-	err := testImageQueries.DeleteImage(ctx, image1.ID)
+	err := testImageOperations.DeleteImage(ctx, image1.ID)
 	require.NoError(t, err)
 
-	image2, err := testImageQueries.FindImage(ctx, image1.ID)
+	image2, err := testImageOperations.FindImage(ctx, image1.ID)
 	require.Error(t, err)
 	// require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, image2)
@@ -131,10 +131,10 @@ func TestDeleteImages(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	err := testImageQueries.DeleteImages(ctx, int64(1))
+	err := testImageOperations.DeleteImages(ctx, 1)
 	require.NoError(t, err)
 
-	images, err := testImageQueries.ListImages(ctx, ListImagesParams{AccountID: 1})
+	images, err := testImageOperations.ListImages(ctx, ListImagesParams{AccountID: 1})
 	require.Error(t, err)
 	require.EqualError(t, err, mongo.ErrNoDocuments.Error())
 	require.Empty(t, images)
