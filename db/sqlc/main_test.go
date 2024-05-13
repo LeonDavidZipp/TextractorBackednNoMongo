@@ -6,17 +6,20 @@ import (
 	"os"
 	"log"
 	"testing"
-	"github.com/LeonDavidZipp/Textractor/util"
 )
 
 var testAccountQueries *Queries
 var testAccountDB *sql.DB
 
 func TestMain(m *testing.M) {
+	var err error
 	testAccountDB, err = sql.Open(
-		os.getenv("POSTGRES_DRIVER"),
-		os.getenv("POSTGRES_SOURCE"),
+		os.Getenv("POSTGRES_DRIVER"),
+		os.Getenv("POSTGRES_SOURCE"),
 	)
+	if err != nil {
+		log.Fatal("Cannot connect to User DB:", err)
+	}
 
 	testAccountQueries = New(testAccountDB)
 
