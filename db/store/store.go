@@ -73,12 +73,19 @@ func (store *SQLMongoStore) execTransaction(
 	}
 	err = fnMongo(store.MongoOperations)
 	if err != nil {
-		if rollbackErr := session.AbortTransaction(ctx); rollbackErr != nil {
-			return fmt.Errorf("mongo transaction err: %v; rollback err: %v", err, rollbackErr)
+		sqlRollbackErr := sqlTransaction.Rollback()
+		mongoRollbackErr := session.AbortTransaction(ctx)
+		if sqlRollbackErr != nil {
+			if mongoRollbackErr != nil {
+				return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v; mongo rollback err: %v", err, sqlRollbackErr, mongoRollbackErr)
+			}
+			return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v", err, sqlRollbackErr)
+		} else if mongoRollbackErr != nil {
+			return fmt.Errorf("mongo transaction err: %v; mongo rollback err: %v", err, mongoRollbackErr)
+		} else {
+			return err
 		}
-		return err
 	}
-
 
 	// err = mongo.WithSession(ctx, session, func(seCtx mongo.SessionContext) error {
 	// 	err := session.StartTransaction()
