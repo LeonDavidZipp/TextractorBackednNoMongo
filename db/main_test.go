@@ -1,21 +1,37 @@
 package db
 
 import (
-	_ "github.com/lib/pq"
 	"context"
+	"database/sql"
+	_ "github.com/lib/pq"
 	"os"
 	"log"
 	"testing"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var testAccountQueries *db.Queries
+var testAccountDB *sql.DB
 
-var testImageOperations *MongoOperations
+var testImageOperations *mongodb.MongoOperations
 var testImageDB *mongo.Database
 
 func TestMain(m *testing.M) {
 	ctx := context.Background()
+
+	var err error
+	testAccountDB, err = sql.Open(
+		os.Getenv("POSTGRES_DRIVER"),
+		os.Getenv("POSTGRES_SOURCE"),
+	)
+	if err != nil {
+		log.Fatal("Cannot connect to User DB:", err)
+	}
+
+	testAccountQueries = db.New(testAccountDB)
 
 	optionsClient := options.Client().ApplyURI(os.Getenv("MONGO_SOURCE"))
 	mongoClient, err := mongo.Connect(ctx, optionsClient)
@@ -30,7 +46,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("Image DB not reachable:", err)
 	}
 
-	testImageOperations = NewMongo(testImageDB)
+	testImageOperations = mongodb.NewMongo(testImageDB)
 
 	os.Exit(m.Run())
 }

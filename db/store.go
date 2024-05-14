@@ -13,7 +13,7 @@ import (
 type Store interface {
 	db.Querier
 	mongodb.MongoOperator
-	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult
+	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error)
 }
 
 type SQLMongoStore struct {
@@ -32,11 +32,6 @@ func NewStore(
 		UserDB: userDB,
 		ImageDB: imageDB,
 	}
-}
-
-type UploadImageTransactionResult struct {
-	Image    mongodb.Image `json:"image"`
-	Uploader db.Account    `json:"uploader"`
 }
 
 func (store *SQLMongoStore) execTransaction(
@@ -102,13 +97,18 @@ func (store *SQLMongoStore) execTransaction(
 
 type UploadImageTransactionParams struct {
 	AccountID int64  `json:"account_id"`
-	Image64   string `json:"image_64"`
 	Text      string `json:"text"`
 	Link      string `json:"link"`
+	Image64   string `json:"image_64"`
+}
+
+type UploadImageTransactionResult struct {
+	Image    mongodb.Image `json:"image"`
+	Uploader db.Account    `json:"uploader"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
-func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) UploadImageTransactionResult {
+func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
 	var result UploadImageTransactionResult
 	
 	err := store.execTransaction(
@@ -138,8 +138,5 @@ func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg Uplo
 			return nil
 		},
 	)
-	if err != nil {
-		return UploadImageTransactionResult{}
-	}
-	return result
+	return result, err
 }
