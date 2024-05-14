@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
 	"testing"
 	"github.com/stretchr/testify/require"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
@@ -37,19 +38,21 @@ func createRandomAccount(t *testing.T) db.Account {
 }
 
 func TestUploadImageTransaction(t *testing.T) {
-	ctx := context.Background()
-	
+	fmt.Println("Testing upload image transaction...")
 	store := NewStore(
 		testAccountDB,
 		testImageDB,
 	)
 	account := createRandomAccount(t)
-	
+
 	results := make(chan UploadImageTransactionResult)
 	errs := make(chan error)
 
-	for i := 1; i <= 10; i++ {
-		go func() {
+	for i := 0; i < 10; i++ {
+		go func(i int) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+			defer cancel()
+
 			result, err := store.UploadImageTransaction(
 				ctx,
 				UploadImageTransactionParams{
@@ -62,10 +65,11 @@ func TestUploadImageTransaction(t *testing.T) {
 
 			results <- result
 			errs <- err
-		}()
+		}(i)
 	}
 
 	for i := 0; i < 10; i++ {
+		ctx := context.Background()
 		err := <- errs
 		require.NoError(t, err)
 
