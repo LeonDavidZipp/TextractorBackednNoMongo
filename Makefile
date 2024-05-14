@@ -1,3 +1,5 @@
+include .env
+
 .PHONY: start startapp startdb createdb migrateup migratedown restartdb dropdb runcmd sqlc test get imagebuild imagerebuild tour server
 
 #############################################################################################################################################################################
@@ -6,39 +8,46 @@
 #																																											#
 #############################################################################################################################################################################
 
-
 all: start
 
 start:
 	docker-compose up
 
+stop:
+	docker-compose down
+
 #############################################################################################################################################################################
 #																																											#
-#	The following commands are used to manage the database.																													#
+#	The following commands are used to manage the user database.																											#
 #																																											#
 #############################################################################################################################################################################
 
 startdb:
-	docker-compose up db \
-	&& make createdb \
-	&& make migrateup
+	docker-compose up db
 
+# creates fresh database && tables in already running db container
 createdb:
-	docker-compose exec db createdb -U exampleuser simple_bank
+	docker-compose exec db createdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
 
 dropdb:
-	docker-compose exec db dropdb -U exampleuser simple_bank
+	docker-compose exec db dropdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
+
+resetdb: dropdb createdb migrateup
 
 migrateup:
-	docker-compose run --rm app migrate -path ./db/migrations -database "postgresql://exampleuser:test1234@db:5432/simple_bank?sslmode=disable" -verbose up
+	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose up
 
 migratedown:
-	docker-compose run --rm app migrate -path ./db/migrations -database "postgresql://exampleuser:test1234@db:5432/simple_bank?sslmode=disable" -verbose down
+	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose down
 
-restartdb: dropdb createdb migrateup
+dbcmd:
+	docker-compose exec db psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
 
-runcmd:
-	docker-compose exec db psql -U exampleuser -d simple_bank -c "$(cmd)"
+
+startmongo:
+	docker-compose up mongo-db
+
+# createmongo
 
 #############################################################################################################################################################################
 #																																											#
@@ -61,8 +70,11 @@ get:
 server:
 	docker-compose run --rm app sh -c "go run main.go"
 
+appcmd:
+	docker-compose run --rm app sh -c "$(cmd)"
+
 mockdb:
-	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/go_simple_bank/db/sqlc $(iname)"
+	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/textractor/db/sqlc $(iname)"
 
 #############################################################################################################################################################################
 #																																											#
@@ -84,3 +96,4 @@ imagerebuild:
 
 tour:
 	tour
+
