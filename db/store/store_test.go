@@ -2,8 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"time"
 	"testing"
 	"github.com/stretchr/testify/require"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
@@ -38,37 +36,40 @@ func createRandomAccount(t *testing.T) db.Account {
 }
 
 func TestUploadImageTransaction(t *testing.T) {
-	fmt.Println("Testing upload image transaction...")
 	store := NewStore(
 		testAccountDB,
 		testImageDB,
 	)
 	account := createRandomAccount(t)
 
-	results := make(chan UploadImageTransactionResult)
-	errs := make(chan error)
+	amount := 10
 
-	for i := 0; i < 10; i++ {
-		go func(i int) {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
-			defer cancel()
+	results := make(chan UploadImageTransactionResult, amount)
+	errs := make(chan error, amount)
+	defer close(results)
+	defer close(errs)
+
+
+	for i := 0; i < amount; i++ {
+		go func() {
+			ctx := context.Background()
 
 			result, err := store.UploadImageTransaction(
 				ctx,
 				UploadImageTransactionParams{
 					AccountID: account.ID,
-					Text: fmt.Sprintf("transaction text %d", i),
-					Link: fmt.Sprintf("transaction link %d", i),
-					Image64: fmt.Sprintf("transaction image %d", i),
+					Text: "some text",
+					Link: "some link",
+					Image64: "some image",
 				},
 			)
 
 			results <- result
 			errs <- err
-		}(i)
+		}()
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < amount; i++ {
 		ctx := context.Background()
 		err := <- errs
 		require.NoError(t, err)
@@ -83,12 +84,15 @@ func TestUploadImageTransaction(t *testing.T) {
 
 		require.Equal(t, account.ID, uploader.ID)
 		require.Equal(t, uploader.ID, image.AccountID)
-		require.Equal(t, account.ImageCount + 1, uploader.ImageCount)
 		require.NotZero(t, image.ID)
-
+		
 		_, err = store.GetAccount(ctx, account.ID)
 		require.NoError(t, err)
 		_, err = store.FindImage(ctx, image.ID)
 		require.NoError(t, err)
 	}
+
+	updatedAccount, err := store.GetAccount(context.Background(), account.ID)
+	require.NoError(t, err)
+	require.Equal(t, account.ImageCount + int64(amount), updatedAccount.ImageCount)
 }

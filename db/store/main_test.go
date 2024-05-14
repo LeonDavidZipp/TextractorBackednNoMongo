@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"os"
-	"fmt"
 	"log"
 	"testing"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -23,7 +22,6 @@ var testImageDB *mongo.Database
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 
-	fmt.Println("Connecting to User DB...")
 	var err error
 	testAccountDB, err = sql.Open(
 		os.Getenv("POSTGRES_DRIVER"),

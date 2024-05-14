@@ -19,8 +19,8 @@ type Store interface {
 type SQLMongoStore struct {
 	*db.Queries
 	*mongodb.MongoOperations
-	UserDB       *sql.DB
-	ImageDB      *mongo.Database
+	UserDB  *sql.DB
+	ImageDB *mongo.Database
 }
 
 func NewStore(
