@@ -1,7 +1,7 @@
 db.createUser(
     {
         user: "imagedb_user",
-        pwd: "70hHf01ghiuinaZgP",
+        pwd: "test123",
         roles: [
         {
             role: "readWrite",

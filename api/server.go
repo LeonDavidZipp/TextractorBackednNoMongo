@@ -1,50 +1,52 @@
 package api
 
-// import (
-// 	"database/sql"
-// 	"net/http"
-// 	"github.com/gin-gonic/gin"
-// 	db "github.com/LeonDavidZipp/Textractor/db"
-// 	sqldb "github.com/LeonDavidZipp/Textractor/db/sqlc"
-// 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
-// )
+import (
+	"database/sql"
+	"net/http"
+	"github.com/gin-gonic/gin"
+	db "github.com/LeonDavidZipp/Textractor/db"
+	sqldb "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+)
 
 
-// type Server struct {
-// 	store db.Store
-// 	router *gin.Engine
-// }
+type Server struct {
+	store db.Store
+	router *gin.Engine
+}
 
-// func NewServer(store db.Store) *Server {
-// 	server := &Server{
-// 		store : store,
-// 	}
+func NewServer(store db.Store) *Server {
+	server := &Server{
+		store : store,
+	}
 
-// 	router := gin.Default()
+	router := gin.Default()
 
-// 	// Accounts (Postgres)
-// 	router.POST("/accounts", server.createAccount)
-// 	router.GET("/accounts/:id", server.getAccount)
-// 	router.GET("accounts", server.listAccounts)
-// 	router.DELETE("/accounts/:id", server.deleteAccount)
+	// Accounts (Postgres)
+	router.POST("/accounts", server.createAccount)
+	router.GET("accounts", server.listAccounts)
+	router.GET("/accounts/:id", server.getAccount)
+	router.DELETE("/accounts/:id", server.deleteAccount)
 	
-// 	// Images (Mongo)
-// 	router.POST("/accounts", server.uploadAccount)
-// 	router.GET("/accounts/images/:id", server.getAccount)
-// 	router.GET("accounts/images", server.listAccounts)
-// 	router.DELETE("/accounts/images/:id", server.deleteImage)
+	// Images (Mongo)
+	router.POST("/accounts/images/", server.uploadImage)
+	router.GET("accounts/images", server.listImages)
+	router.DELETE("/accounts/images", server.deleteImages)
+	router.GET("/accounts/images/:id", server.findImage)
+	router.DELETE("/accounts/images/:id", server.deleteImage)
+	router.PATCH("/accounts/images/:id", server.updateImage)
 
-// 	server.router = router
+	server.router = router
 
-// 	return server
-// }
+	return server
+}
 
-// // Starts http server on specified address
-// func (server *Server) Start(address string) error {
-// 	return server.router.Run(address)
-// }
+// Starts http server on specified address
+func (server *Server) Start(address string) error {
+	return server.router.Run(address)
+}
 
-// // formats error response into json body
-// func errorResponse(err error) gin.H {
-// 	return gin.H{"error": err.Error()}
-// }
+// formats error response into json body
+func errorResponse(err error) gin.H {
+	return gin.H{"error": err.Error()}
+}
