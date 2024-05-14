@@ -13,6 +13,9 @@ all: start
 start:
 	docker-compose up
 
+stop:
+	docker-compose down
+
 #############################################################################################################################################################################
 #																																											#
 #	The following commands are used to manage the user database.																											#
