@@ -113,13 +113,31 @@ type listImagesRequest {
 	Offset    int32 `json:"offset" binding:"required"`
 }
 
-func (s *Server) listImage(ctx *gin.Context) {
+func (s *Server) listImages(ctx *gin.Context) {
 	var req listImageRequest
 
 	if err := ctx.ShouldBindJson(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return 
 	}
 
+	arg := mongodb.ListImagesParams{
+		AccountID: req.AccountID,
+		Limit: req.Limit,
+		Offset: req.Offset,
+	}
+
+	images, err := s.store.ListImages(ctx, arg)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, images)
 }
 
 // Delete Images
