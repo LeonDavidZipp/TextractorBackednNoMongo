@@ -1,4 +1,4 @@
-package db
+package api
 
 import (
 	_ "github.com/lib/pq"

@@ -24,7 +24,6 @@ func NewServer(store db.Store) *Server {
 
 	// Accounts (Postgres)
 	router.POST("/accounts", server.createAccount)
-	// router.GET("accounts", server.listAccounts)
 
 	router.GET("/accounts/:id", server.getAccount)
 	router.DELETE("/accounts/:id", server.deleteAccount)
