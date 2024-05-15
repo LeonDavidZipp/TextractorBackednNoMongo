@@ -10,10 +10,10 @@ import (
 // Postgres
 // Create Account
 type createAccountRequest struct {
-	Owner      string         `json:"owner" binding:"reuired"`
+	Owner      string         `json:"owner" binding:"required"`
 	Email      string         `json:"email" binding:"required"`
-	GoogleID   sql.NullString `json:"google_id"`
-	FacebookID sql.NullString `json:"facebook_id"`
+	GoogleID   *string        `json:"google_id"`
+	FacebookID *string        `json:"facebook_id"`
 }
 
 func (s *Server) createAccount(ctx *gin.Context) {
@@ -24,11 +24,26 @@ func (s *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	var googleID, facebookID sql.NullString
+
+	if req.GoogleID != nil {
+		googleID = sql.NullString{
+			String: *req.GoogleID,
+			Valid:  true,
+		}
+	}
+	if req.FacebookID != nil {
+		facebookID = sql.NullString{
+			String: *req.FacebookID,
+			Valid:  true,
+		}
+	}
+
 	arg := db.CreateAccountParams{
-		Owner: req.Owner,
-		Email: req.Email,
-		GoogleID: req.GoogleID,
-		FacebookID: req.FacebookID,
+		Owner:      req.Owner,
+		Email:      req.Email,
+		GoogleID:   googleID,
+		FacebookID: facebookID,
 	}
 
 	account, err := s.store.CreateAccount(ctx, arg)

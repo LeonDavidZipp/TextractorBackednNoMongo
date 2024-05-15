@@ -1,12 +1,8 @@
 package api
 
 import (
-	// "database/sql"
-	// "net/http"
 	"github.com/gin-gonic/gin"
 	st "github.com/LeonDavidZipp/Textractor/db/store"
-	// sqldb "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	// mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 )
 
 
