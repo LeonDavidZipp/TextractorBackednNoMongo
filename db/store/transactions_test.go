@@ -8,7 +8,6 @@ import (
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"github.com/LeonDavidZipp/Textractor/util"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -144,22 +143,16 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, account.ImageCount - int64(len(toDelete)), updatedAccount.ImageCount)
 
-	filter := bson.M{"_id": bson.M{"$in": toDelete}}
-	cursor, err := store.ImageDB.Collection("images").Find(ctx, filter)
-	require.Error(t, err)
-
-	var images []mongodb.Image
-	err = cursor.All(ctx, &images)
-	require.NoError(t, err)
-	require.Empty(t, images)
+	for _, id := range toDelete {
+		image, err := store.FindImage(ctx, id)
+		require.Error(t, err)
+		require.Empty(t, image)
+	}
 
 	remaining := imageIDs[amount/2:]
-	filter = bson.M{"_id": bson.M{"$in": remaining}}
-	cursor, err = store.ImageDB.Collection("images").Find(ctx, filter)
-	require.NoError(t, err)
-
-	images = nil
-	err = cursor.All(ctx, &images)
-	require.NoError(t, err)
-	require.Len(t, images, len(remaining))
+	for _, id := range remaining {
+		image, err := store.FindImage(ctx, id)
+		require.NoError(t, err)
+		require.NotEmpty(t, image)
+	}
 }
