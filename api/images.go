@@ -22,6 +22,7 @@ func (s *Server) insertImage(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJson(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
 	arg :=mongodb.InsertImageParams{
@@ -50,6 +51,7 @@ func (s *Server) findImage(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJson(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
 	image, err := s.store.FindImage(ctx, req.ID)
@@ -76,7 +78,16 @@ func (s *Server) deleteImage(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJson(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
+
+	_, err := s.store.DeleteImage(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK)
 
 }
 
