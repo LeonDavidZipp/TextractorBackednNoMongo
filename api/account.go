@@ -65,7 +65,7 @@ type deleteAccountRequest {
 	ID int64 `json:"id" binding:"required"`
 }
 
-func (s *Server) getAccount(ctx *gin.Context) {
+func (s *Server) deleteAccount(ctx *gin.Context) {
 	var req deleteAccountRequest
 
 	if err := ctx.ShouldBindJson(&req); err != nil {
