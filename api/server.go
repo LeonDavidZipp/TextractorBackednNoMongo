@@ -24,7 +24,8 @@ func NewServer(store db.Store) *Server {
 
 	// Accounts (Postgres)
 	router.POST("/accounts", server.createAccount)
-	router.GET("accounts", server.listAccounts)
+	// router.GET("accounts", server.listAccounts)
+
 	router.GET("/accounts/:id", server.getAccount)
 	router.DELETE("/accounts/:id", server.deleteAccount)
 	
@@ -32,6 +33,7 @@ func NewServer(store db.Store) *Server {
 	router.POST("/accounts/images/", server.uploadImage)
 	router.GET("accounts/images", server.listImages)
 	router.DELETE("/accounts/images", server.deleteImages)
+
 	router.GET("/accounts/images/:id", server.findImage)
 	router.DELETE("/accounts/images/:id", server.deleteImage)
 	router.PATCH("/accounts/images/:id", server.updateImage)
