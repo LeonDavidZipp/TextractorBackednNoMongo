@@ -8,7 +8,7 @@ import (
 	"testing"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	db "github.com/LeonDavidZipp/Textractor/db/"
+	db "github.com/LeonDavidZipp/Textractor/db"
 	"database/sql"
 	sqldb "github.com/LeonDavidZipp/Textractor/db/sql_db"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"

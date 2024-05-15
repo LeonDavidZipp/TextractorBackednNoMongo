@@ -19,7 +19,7 @@ type createAccountRequest struct {
 func (s *Server) createAccount(ctx *gin.Context) {
 	var req createAccountRequest
 
-	if err := ctx.ShouldBindJson(); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -36,6 +36,8 @@ func (s *Server) createAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	ctx.JSON(http.StatusOK, account)
 }
 
 // Get Account
@@ -46,7 +48,7 @@ type getAccountRequest struct {
 func (s *Server) getAccount(ctx *gin.Context) {
 	var req getAccountRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -61,23 +63,23 @@ func (s *Server) getAccount(ctx *gin.Context) {
 }
 
 // Delete Account
-type deleteAccountRequest {
+type deleteAccountRequest struct {
 	ID int64 `json:"id" binding:"required"`
 }
 
 func (s *Server) deleteAccount(ctx *gin.Context) {
 	var req deleteAccountRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	_, err := s.store.DeleteAccount(ctx, req.ID)
+	err := s.store.DeleteAccount(ctx, req.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK)
+	ctx.Status(http.StatusOK)
 }

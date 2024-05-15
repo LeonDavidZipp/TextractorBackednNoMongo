@@ -1,21 +1,21 @@
 package api
 
 import (
-	"database/sql"
-	"net/http"
+	// "database/sql"
+	// "net/http"
 	"github.com/gin-gonic/gin"
-	db "github.com/LeonDavidZipp/Textractor/db"
-	sqldb "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	st "github.com/LeonDavidZipp/Textractor/db/store"
+	// sqldb "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	// mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 )
 
 
 type Server struct {
-	store db.Store
+	store st.Store
 	router *gin.Engine
 }
 
-func NewServer(store db.Store) *Server {
+func NewServer(store st.Store) *Server {
 	server := &Server{
 		store : store,
 	}
@@ -29,7 +29,7 @@ func NewServer(store db.Store) *Server {
 	router.DELETE("/accounts/:id", server.deleteAccount)
 	
 	// Images (Mongo)
-	router.POST("/accounts/images/", server.uploadImage)
+	router.POST("/accounts/images/", server.insertImage)
 	router.GET("accounts/images", server.listImages)
 	router.DELETE("/accounts/images", server.deleteImages)
 

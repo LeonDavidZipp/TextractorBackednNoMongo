@@ -75,6 +75,9 @@ appcmd:
 mockdb:
 	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/Textractor/db/store $(iname)"
 
+startmdb:
+	docker-compose up mongo-db
+
 #############################################################################################################################################################################
 #																																											#
 #	The following commands are used to handle docker tasks																													#

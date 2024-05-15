@@ -1,15 +1,16 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
+	"errors"
 	"github.com/gin-gonic/gin"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Insert Image
-type insertImageRequest {
+type insertImageRequest struct {
 	AccountID int64  `json:"account_id" binding:"required"`
 	Text      string `bson:"text" json:"text"`
 	// link to the image in s3 storage
@@ -20,7 +21,7 @@ type insertImageRequest {
 func (s *Server) insertImage(ctx *gin.Context) {
 	var req insertImageRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -42,14 +43,14 @@ func (s *Server) insertImage(ctx *gin.Context) {
 }
 
 // Find Image
-type findImageRequest {
+type findImageRequest struct {
 	ID primitive.ObjectID `json:"id" binding:"required"`
 }
 
 func (s *Server) findImage(ctx *gin.Context) {
 	var req findImageRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -69,30 +70,30 @@ func (s *Server) findImage(ctx *gin.Context) {
 }
 
 // Delete Image
-type deleteImageRequest {
+type deleteImageRequest struct {
 	ID primitive.ObjectID `json:"id" binding:"required"`
 }
 
 func (s *Server) deleteImage(ctx *gin.Context) {
 	var req deleteImageRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	_, err := s.store.DeleteImage(ctx, req.ID)
+	err := s.store.DeleteImage(ctx, req.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK)
+	ctx.Status(http.StatusOK)
 
 }
 
 // Update Image
-type updateImageRequest {
+type updateImageRequest struct {
 	ID          primitive.ObjectID  `json:"id" binding:"required"`
 	UpdatedText string `json:"updated_text" binding:"required"`
 }
@@ -100,23 +101,23 @@ type updateImageRequest {
 func (s *Server) updateImage(ctx *gin.Context) {
 	var req updateImageRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
 
 }
 
 // List Images
-type listImagesRequest {
+type listImagesRequest struct {
 	AccountID int64 `json:"account_id" binding:"required"`
-	Limit     int32 `json:"limit" binding:"required"`
-	Offset    int32 `json:"offset" binding:"required"`
+	Limit     int64 `json:"limit" binding:"required"`
+	Offset    int64 `json:"offset" binding:"required"`
 }
 
 func (s *Server) listImages(ctx *gin.Context) {
-	var req listImageRequest
+	var req listImagesRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return 
 	}
@@ -141,23 +142,23 @@ func (s *Server) listImages(ctx *gin.Context) {
 }
 
 // Delete Images
-type deleteImagesRequest {
+type deleteImagesRequest struct {
 	ImageIDs []primitive.ObjectID `json:"image_ids" binding:"required"`
 }
 
 func (s *Server) deleteImages(ctx *gin.Context) {
 	var req deleteImagesRequest
 
-	if err := ctx.ShouldBindJson(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	_, err := s.store.DeleteImages(ctx, req.ImageIDs)
+	err := s.store.DeleteImages(ctx, req.ImageIDs)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK)
+	ctx.Status(http.StatusOK)
 }

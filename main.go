@@ -3,12 +3,12 @@ package main
 import (
 	"database/sql"
 	"log"
+	"os"
 	"context"
 	"time"
-	util "github.com/LeonDavidZipp/Textractor/util"
+	_ "github.com/lib/pq"
 	st "github.com/LeonDavidZipp/Textractor/db/store"
-	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	// mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	api "github.com/LeonDavidZipp/Textractor/api"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -34,18 +34,18 @@ func main() {
 	}
 	defer mongoClient.Disconnect(ctx)
 
-	imageDB = mongoClient.Database(os.Getenv("MONGO_DB_NAME"))
+	imageDB := mongoClient.Database(os.Getenv("MONGO_DB_NAME"))
 	err = imageDB.Client().Ping(ctx, nil)
 	if err != nil {
 		log.Fatal("Image DB not reachable:", err)
 	}
 
-	imageOperations = NewMongo(imageDB)
+	// imageOperations := mongodb.NewMongo(imageDB)
 
 	store := st.NewStore(userDB, imageDB)
 	server := api.NewServer(store)
 
-	err = server.Start(config.ServerAddress)
+	err = server.Start(os.Getenv("SERVER_ADDRESS"))
 	if err != nil {
 		log.Fatal("Cannot start server:", err)
 	}
