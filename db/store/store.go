@@ -23,9 +23,7 @@ type SQLMongoStore struct {
 	ImageDB *mongo.Database
 }
 
-func NewStore(
-	userDB *sql.DB,
-	imageDB *mongo.Database) Store {
+func NewStore(userDB *sql.DB, imageDB *mongo.Database) Store {
 	return &SQLMongoStore{
 		Queries: db.New(userDB),
 		MongoOperations: mongodb.NewMongo(imageDB),

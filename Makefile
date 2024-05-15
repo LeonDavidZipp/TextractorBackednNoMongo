@@ -43,7 +43,6 @@ migratedown:
 dbcmd:
 	docker-compose exec db psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
 
-
 startmongo:
 	docker-compose up mongo-db
 
@@ -74,7 +73,7 @@ appcmd:
 	docker-compose run --rm app sh -c "$(cmd)"
 
 mockdb:
-	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/textractor/db/sqlc $(iname)"
+	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/textractor/db/store $(iname)"
 
 #############################################################################################################################################################################
 #																																											#
