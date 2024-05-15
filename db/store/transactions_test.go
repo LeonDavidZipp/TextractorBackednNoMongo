@@ -4,9 +4,12 @@ import (
 	"context"
 	"testing"
 	"github.com/stretchr/testify/require"
-	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	"github.com/LeonDavidZipp/Textractor/util"
 	"database/sql"
+	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	"github.com/LeonDavidZipp/Textractor/util"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var testImage string
@@ -95,4 +98,68 @@ func TestUploadImageTransaction(t *testing.T) {
 	updatedAccount, err := store.GetAccount(context.Background(), account.ID)
 	require.NoError(t, err)
 	require.Equal(t, account.ImageCount + int64(amount), updatedAccount.ImageCount)
+}
+
+func TestDeleteImagesTransaction(t *testing.T) {
+	store := NewStore(
+		testAccountDB,
+		testImageDB,
+	)
+	ctx := context.Background()
+	
+	account, err := store.CreateAccount(
+		ctx,
+		db.CreateAccountParams{
+			Owner: util.RandomName(),
+			Email: util.RandomEmail(),
+		},
+	)
+	require.NoError(t, err)
+
+	amount := 10
+	imageIDs := make([]primitive.ObjectID, amount)
+	for i := 0; i < amount; i++ {
+		image, err := store.InsertImage(
+			ctx,
+			mongodb.InsertImageParams{
+				AccountID: account.ID,
+				Text: "some text",
+				Link: "some link",
+				Image64: "some image",
+			},
+		)
+		require.NoError(t, err)
+		imageIDs[i] = image.ID
+	}
+
+	toDelete := imageIDs[:amount/2]
+	updatedAccount, err := store.DeleteImagesTransaction(
+		ctx,
+		DeleteImagesTransactionParams{
+			AccountID: account.ID,
+			ImageIDs: toDelete,
+			Amount: int64(len(toDelete)),
+		},
+	)
+	require.NoError(t, err)
+	require.Equal(t, account.ImageCount - int64(len(toDelete)), updatedAccount.ImageCount)
+
+	filter := bson.M{"_id": bson.M{"$in": toDelete}}
+	cursor, err := store.ImageDB.Collection("images").Find(ctx, filter)
+	require.Error(t, err)
+
+	var images []mongodb.Image
+	err = cursor.All(ctx, &images)
+	require.NoError(t, err)
+	require.Empty(t, images)
+
+	remaining := imageIDs[amount/2:]
+	filter = bson.M{"_id": bson.M{"$in": remaining}}
+	cursor, err = store.ImageDB.Collection("images").Find(ctx, filter)
+	require.NoError(t, err)
+
+	images = nil
+	err = cursor.All(ctx, &images)
+	require.NoError(t, err)
+	require.Len(t, images, len(remaining))
 }

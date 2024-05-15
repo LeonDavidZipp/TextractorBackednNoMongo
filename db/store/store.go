@@ -13,6 +13,7 @@ type Store interface {
 	db.Querier
 	mongodb.MongoOperator
 	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error)
+	DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error)
 }
 
 type SQLMongoStore struct {
