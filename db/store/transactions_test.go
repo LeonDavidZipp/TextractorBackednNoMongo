@@ -4,9 +4,11 @@ import (
 	"context"
 	"testing"
 	"github.com/stretchr/testify/require"
-	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	"github.com/LeonDavidZipp/Textractor/util"
 	"database/sql"
+	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	"github.com/LeonDavidZipp/Textractor/util"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var testImage string
@@ -95,4 +97,62 @@ func TestUploadImageTransaction(t *testing.T) {
 	updatedAccount, err := store.GetAccount(context.Background(), account.ID)
 	require.NoError(t, err)
 	require.Equal(t, account.ImageCount + int64(amount), updatedAccount.ImageCount)
+}
+
+func TestDeleteImagesTransaction(t *testing.T) {
+	store := NewStore(
+		testAccountDB,
+		testImageDB,
+	)
+	ctx := context.Background()
+	
+	account, err := store.CreateAccount(
+		ctx,
+		db.CreateAccountParams{
+			Owner: util.RandomName(),
+			Email: util.RandomEmail(),
+		},
+	)
+	require.NoError(t, err)
+
+	amount := 10
+	imageIDs := make([]primitive.ObjectID, amount)
+	for i := 0; i < amount; i++ {
+		image, err := store.InsertImage(
+			ctx,
+			mongodb.InsertImageParams{
+				AccountID: account.ID,
+				Text: "some text",
+				Link: "some link",
+				Image64: "some image",
+			},
+		)
+		require.NoError(t, err)
+		imageIDs[i] = image.ID
+	}
+
+	toDelete := imageIDs[:amount/2]
+	updatedAccount, err := store.DeleteImagesTransaction(
+		ctx,
+		DeleteImagesTransactionParams{
+			AccountID: account.ID,
+			ImageIDs: toDelete,
+			Amount: int64(len(toDelete)),
+		},
+	)
+	require.NoError(t, err)
+	require.Equal(t, account.ImageCount - int64(len(toDelete)), updatedAccount.ImageCount)
+
+	for _, id := range toDelete {
+		image, err := store.FindImage(ctx, id)
+		require.Error(t, err)
+		require.Empty(t, image)
+	}
+
+	remaining := imageIDs[amount/2:]
+	for _, id := range remaining {
+		image, err := store.FindImage(ctx, id)
+		require.NoError(t, err)
+		require.NotEmpty(t, image)
+	}
 }
