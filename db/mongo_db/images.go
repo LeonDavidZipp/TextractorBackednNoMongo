@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,7 +22,7 @@ func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParam
 	inserted, err := op.db.Collection("imagedb").InsertOne(ctx, arg)
 
 	if err != nil {
-		return Image{}, fmt.Errorf("Could not insert image: %w", err)
+		return Image{}, err
 	}
 
 	image := Image{
@@ -43,7 +42,7 @@ func (op *MongoOperations) FindImage(ctx context.Context, id primitive.ObjectID)
 	var image Image
 	err := op.db.Collection("imagedb").FindOne(ctx, filter).Decode(&image)
 	if err != nil {
-		return Image{}, fmt.Errorf("Could not find image: %w", err)
+		return Image{}, err
 	}
 	return image, nil
 }
@@ -63,13 +62,13 @@ func (op *MongoOperations) ListImages(ctx context.Context, arg ListImagesParams)
 
 	cursor, err := op.db.Collection("imagedb").Find(ctx, filter, findOptions)
 	if err != nil {
-		return nil, fmt.Errorf("Could not list images: %w", err)
+		return nil, err
 	}
 	defer cursor.Close(ctx)
 
 	var images []Image
 	if err = cursor.All(ctx, &images); err != nil {
-		return nil, fmt.Errorf("Could not decode images: %w", err)
+		return nil, err
 	}
 
 	return images, nil
@@ -108,7 +107,7 @@ func (op *MongoOperations) DeleteImage(ctx context.Context, id primitive.ObjectI
 
 	_, err := op.db.Collection("imagedb").DeleteOne(ctx, filter)
 	if err != nil {
-		return fmt.Errorf("Could not delete image: %w", err)
+		return err
 	}
 
 	return nil
@@ -119,7 +118,7 @@ func (op *MongoOperations) DeleteImages(ctx context.Context, ids []primitive.Obj
 
 	_, err := op.db.Collection("imagedb").DeleteMany(ctx, filter)
 	if err != nil {
-		return fmt.Errorf("Could not delete images: %w", err)
+		return err
 	}
 
 	return nil
