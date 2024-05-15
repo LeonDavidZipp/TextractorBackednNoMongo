@@ -150,6 +150,14 @@ func (s *Server) deleteImages(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJson(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
+	_, err := s.store.DeleteImages(ctx, req.ImageIDs)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK)
 }
