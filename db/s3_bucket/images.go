@@ -35,17 +35,31 @@ func (c *Client) UploadImage(ctx context.Context, arg UploadImageParams) (string
 	return result.Location, err
 }
 
-func (c *Client) DeleteImage(ctx context.Context, link string) error {
-	parsed, err := url.Parse(link)
-	if err != nil {
-		return err
+func (c *Client) DeleteImages(ctx context.Context, links []string) error {
+	var objectIds []types.ObjectIdentifier
+	for _, link := range links {
+		parsed, err := url.Parse(link)
+		if err != nil {
+			return err
+		}
+		key := strings.TrimPrefix(parsed.Path, "/")
+		objectIds = append(objectIds, types.ObjectIdentifier{Key: aws.String(key)})
 	}
-	imageID := strings.TrimPrefix(parsed.Path, "/")
 
-	_, err = c.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+	_, err = c.client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-		Key:    aws.String(imageID),
+		Delete: &types.Delete{Objects: objectIds},
 		},
 	)
 	return err
+}
+
+func (c *Client) DeleteImages(ctx context.Context, links []string) error {
+	for _, link := range links {
+		err := c.DeleteImage(ctx, link)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
