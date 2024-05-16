@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/mongo"
+	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 )
 
 
@@ -21,6 +23,7 @@ type SQLMongoStore struct {
 	*mongodb.MongoOperations
 	UserDB  *sql.DB
 	ImageDB *mongo.Database
+	ImageBucket *s3.S3
 }
 
 func NewStore(userDB *sql.DB, imageDB *mongo.Database) Store {
