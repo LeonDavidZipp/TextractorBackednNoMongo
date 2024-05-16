@@ -6,6 +6,9 @@ import (
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/config"
 )
 
 
@@ -14,6 +17,14 @@ func (store *SQLMongoStore) execTransaction(
 	fnSql func(*db.Queries) error,
 	fnMongo func(*mongodb.MongoOperations) error,
 ) error {
+	// s3
+	s3Session := session.New()
+	s3Service := s3.New(s3Session)
+	defer s3Session.Close()
+	if err := fnS3(s3Service); err != nil {
+		return err
+	}
+	
 	// postgres
 	sqlTransaction, err := store.UserDB.BeginTx(ctx, nil)
 	if err != nil {
