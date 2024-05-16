@@ -16,6 +16,7 @@ import (
 type Store interface {
 	db.Querier
 	mongodb.MongoOperator
+	bucket.S3Operator
 	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error)
 	DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error)
 }
