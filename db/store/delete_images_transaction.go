@@ -16,7 +16,7 @@ type DeleteImagesTransactionParams struct {
 
 
 // Delete Images handles deletion of multiple images from the databases.
-func (store *SQLMongoStore) DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error) {
+func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error) {
 	var uploader db.Account
 
 	err := store.execTransaction(

@@ -12,7 +12,7 @@ import (
 )
 
 
-func (store *SQLMongoStore) execTransaction(
+func (store *DBStore) execTransaction(
 	ctx context.Context,
 	fnS3 func(*s3.Client) error,
 	rollbackS3 func(*s3.Client) error,

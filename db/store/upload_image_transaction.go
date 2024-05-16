@@ -20,7 +20,7 @@ type UploadImageTransactionResult struct {
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
-func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
+func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
 	var uploader db.Account
 	var image mongodb.Image
 
