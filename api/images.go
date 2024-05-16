@@ -7,6 +7,7 @@ import (
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	st "github.com/LeonDavidZipp/Textractor/db/store"
 )
 
 // Insert Image
@@ -26,20 +27,20 @@ func (s *Server) insertImage(ctx *gin.Context) {
 		return
 	}
 
-	arg :=mongodb.InsertImageParams{
+	arg := st.UploadImageTransactionParams{
 		AccountID: req.AccountID,
 		Text: req.Text,
 		Link: req.Link,
 		Image64: req.Image64,
 	}
 
-	image, err := s.store.InsertImage(ctx, arg)
+	result, err := s.store.UploadImageTransaction(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, image)
+	ctx.JSON(http.StatusOK, result)
 }
 
 // Find Image
