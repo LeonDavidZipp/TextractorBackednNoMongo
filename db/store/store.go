@@ -16,7 +16,7 @@ import (
 type Store interface {
 	db.Querier
 	mongodb.MongoOperator
-	bucket.S3Uploader
+	bucket.S3Client
 	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error)
 	DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error)
 }
@@ -24,9 +24,10 @@ type Store interface {
 type DBStore struct {
 	*db.Queries
 	*mongodb.MongoOperations
+	*s3.Client
 	UserDB  *sql.DB
 	ImageDB *mongo.Database
-	S3Uploader *manager.Uploader
+	// S3Uploader *manager.Uploader
 }
 
 func NewStore(userDB *sql.DB, imageDB *mongo.Database, s3Uploader *manager.Uploader) Store {

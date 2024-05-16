@@ -6,8 +6,8 @@ import (
 
 
 // just first structure
-type S3Uploader interface {
-	UploadImage()
+type S3Client interface {
+	UploadImage(ctx context.Context, arg UploadImageParams) (string, error)
 	DeleteImage()
 	DeleteImages()
 }
