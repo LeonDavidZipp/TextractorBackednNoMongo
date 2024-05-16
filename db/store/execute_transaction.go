@@ -14,10 +14,12 @@ import (
 
 func (store *SQLMongoStore) execTransaction(
 	ctx context.Context,
+	fnS3 func(*s3.Client) error,
+	rollbackS3 func(*s3.Client) error,
 	fnSql func(*db.Queries) error,
 	fnMongo func(*mongodb.MongoOperations) error,
 ) error {
-	// s3
+	// s3: AUTOMATICALLY COMMITED WHEN SUCCESSFUL
 	s3Session := session.New()
 	s3Service := s3.New(s3Session)
 	defer s3Session.Close()
@@ -28,23 +30,38 @@ func (store *SQLMongoStore) execTransaction(
 	// postgres
 	sqlTransaction, err := store.UserDB.BeginTx(ctx, nil)
 	if err != nil {
+		if s3RbErr := rollbackS3(s3Service); s3RbErr != nil {
+			return fmt.Errorf("sql err: %v; rollback err: %v", err, s3RbErr)
+		}
 		return err
 	}
 
 	sqlQuerie := db.New(sqlTransaction)
 	err = fnSql(sqlQuerie)
 	if err != nil {
-		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
+		if sqlRbErr := sqlTransaction.Rollback(); sqlRbErr != nil {
+			return fmt.Errorf("transaction err: %v; rollback err: %v", err, sqlRbErr)
 		}
 		return err
 	}
 
 	// mongodb
 	session, err := store.ImageDB.Client().StartSession()
+	// if err != nil {
+	// 	if sqlRbErr := sqlTransaction.Rollback(); sqlRbErr != nil {
+	// 		return fmt.Errorf("transaction err: %v; rollback err: %v", err, sqlRbErr)
+	// 	}
+	// 	return err
+	// }
 	if err != nil {
-		if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-			return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
+		if sqlRbErr := sqlTransaction.Rollback(); sqlRbErr != nil {
+			if s3RbErr := rollbackS3(s3Service); s3RbErr != nil {
+				return fmt.Errorf("transaction err: %v; sql rollback err: %v; s3 rollback err: %v", err, sqlRbErr, s3RbErr)
+			}
+			return fmt.Errorf("transaction err: %v; sql rollback err: %v", err, sqlRbErr)
+		}
+		if s3RbErr := rollbackS3(s3Service); s3RbErr != nil {
+			return fmt.Errorf("transaction err: %v; s3 rollback err: %v", err, s3RbErr)
 		}
 		return err
 	}
@@ -52,22 +69,39 @@ func (store *SQLMongoStore) execTransaction(
 	err = mongo.WithSession(ctx, session, func(seCtx mongo.SessionContext) error {
 		err := session.StartTransaction()
 		if err != nil {
-			if rollbackErr := sqlTransaction.Rollback(); rollbackErr != nil {
-				return fmt.Errorf("transaction err: %v; rollback err: %v", err, rollbackErr)
+			if sqlRbErr := sqlTransaction.Rollback(); sqlRbErr != nil {
+				if s3RbErr := rollbackS3(s3Service); s3RbErr != nil {
+					return fmt.Errorf("transaction err: %v; sql rollback err: %v; s3 rollback err: %v", err, sqlRbErr, s3RbErr)
+				}
+				return fmt.Errorf("transaction err: %v; sql rollback err: %v", err, sqlRbErr)
+			}
+			if s3RbErr := rollbackS3(s3Service); s3RbErr != nil {
+				return fmt.Errorf("transaction err: %v; s3 rollback err: %v", err, s3RbErr)
 			}
 			return err
 		}
+
 		err = fnMongo(store.MongoOperations)
 		if err != nil {
-			sqlRollbackErr := sqlTransaction.Rollback()
-			mongoRollbackErr := session.AbortTransaction(ctx)
-			if sqlRollbackErr != nil {
-				if mongoRollbackErr != nil {
-					return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v; mongo rollback err: %v", err, sqlRollbackErr, mongoRollbackErr)
+			s3RbErr := rollbackS3(s3Service)
+			sqlRbErr := sqlTransaction.Rollback()
+			mongoRbErr := session.AbortTransaction(ctx)
+			if sqlRbErr != nil || s3RbErr != nil || mongoRbErr != nil {
+				if sqlRbErr != nil && mongoRbErr != nil && s3RbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v; mongo rollback err: %v; s3 rollback err: %v", err, sqlRbErr, mongoRbErr, s3RbErr)
+				} else if sqlRbErr != nil && s3RbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v; s3 rollback err: %v", err, sqlRbErr, s3RbErr)
+				} else if sqlRbErr != nil && mongoRbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v; mongo rollback err: %v", err, sqlRbErr, mongoRbErr)
+				} else if mongoRbErr != nil && s3RbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; mongo rollback err: %v; s3 rollback err: %v", err, mongoRbErr, s3RbErr)
+				} else if sqlRbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v", err, sqlRbErr)
+				} else if mongoRbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; mongo rollback err: %v", err, mongoRbErr)
+				} else if s3RbErr != nil {
+					return fmt.Errorf("mongo transaction err: %v; s3 rollback err: %v", err, s3RbErr)
 				}
-				return fmt.Errorf("mongo transaction err: %v; sql rollback err: %v", err, sqlRollbackErr)
-			} else if mongoRollbackErr != nil {
-				return fmt.Errorf("mongo transaction err: %v; mongo rollback err: %v", err, mongoRollbackErr)
 			} else {
 				return err
 			}
