@@ -17,7 +17,6 @@ type InsertImageParams struct {
 }
 
 // InsertImage inserts a new image into the database
-// TODO: implement not for Store but for Mongo "Queries"
 func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParams) (Image, error) {
 	inserted, err := op.db.Collection("imagedb").InsertOne(ctx, arg)
 

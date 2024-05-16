@@ -11,12 +11,17 @@ import (
 )
 
 // Insert Image
+// type insertImageRequest struct {
+// 	AccountID int64  `json:"account_id" binding:"required"`
+// 	Text      string `bson:"text" json:"text"`
+// 	// link to the image in s3 storage
+// 	Link      string `bson:"link" json:"link"`
+// 	Image64   string `bson:"image_64" json:"image_64"`
+// }
+
 type insertImageRequest struct {
 	AccountID int64  `json:"account_id" binding:"required"`
-	Text      string `bson:"text" json:"text"`
-	// link to the image in s3 storage
-	Link      string `bson:"link" json:"link"`
-	Image64   string `bson:"image_64" json:"image_64"`
+	Filepath  string `json:"filepath" binding:"required"`
 }
 
 func (s *Server) insertImage(ctx *gin.Context) {
