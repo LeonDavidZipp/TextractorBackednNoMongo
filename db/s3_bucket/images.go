@@ -13,13 +13,8 @@ import (
 )
 
 
-type UploadImageParams struct {
-	// ID string `json:"id"`
-	Image []byte `json:"image"`
-}
-
 // https://stackoverflow.com/questions/56744834/how-do-i-get-file-url-after-put-file-to-amazon-s3-in-go
-func (c *Client) UploadImage(ctx context.Context, arg UploadImageParams) (string, error) {
+func (c *Client) UploadImage(ctx context.Context, imageData []bytes) (string, error) {
 	uploader := manager.NewUploader(c.client)
 
 	result, err := uploader.Upload(
