@@ -45,18 +45,15 @@ func main() {
 	}
 
 	// s3
-	s3Session, err := session.NewSession(
-		&aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-	})
+	config, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		log.Fatal("Cannot create S3 session:", err)
+		log.Fatal("Cannot load AWS config:", err)
 	}
 
+	s3Client := s3.NewFromConfig(config)
+	s3Uploader := s3.NewUploader(s3Client)
 
-
-
-	store := st.NewStore(userDB, imageDB)
+	store := st.NewStore(userDB, imageDB, s3Uploader)
 	server := api.NewServer(store)
 
 	err = server.Start(os.Getenv("SERVER_ADDRESS"))
