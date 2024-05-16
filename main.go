@@ -52,10 +52,9 @@ func main() {
 	}
 
 	s3Client := s3.NewFromConfig(config)
-	s3Uploader := manager.NewUploader(s3Client)
 
 	// server && startup
-	store := st.NewStore(userDB, imageDB, s3Uploader)
+	store := st.NewStore(userDB, imageDB, s3Client)
 	server := api.NewServer(store)
 
 	err = server.Start(os.Getenv("SERVER_ADDRESS"))
