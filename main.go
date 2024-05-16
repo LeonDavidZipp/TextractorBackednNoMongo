@@ -53,6 +53,7 @@ func main() {
 	s3Client := s3.NewFromConfig(config)
 	s3Uploader := s3.NewUploader(s3Client)
 
+	// server && startup
 	store := st.NewStore(userDB, imageDB, s3Uploader)
 	server := api.NewServer(store)
 
