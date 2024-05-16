@@ -49,6 +49,18 @@ services:
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
         env_file: .env
 
+    # cache:
+    #     image: redis:latest
+    #     container_name: cache
+    #     restart: unless-stopped
+    #     expose:
+    #         - ${REDIS_PORT}
+    #     ports:
+    #         - ${REDIS_PORT}:${REDIS_PORT}
+    #     volumes:
+    #         - cache-data:/data
+    #     env_file: .env
+
     # auth:
     #   image: keycloak:latest
     #   container_name: auth
