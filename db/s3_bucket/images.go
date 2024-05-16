@@ -4,21 +4,28 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"context"
+	"bytes"
+	"os"
+	"github.com/google/uuid"
 )
 
 
 type UploadImageParams struct {
-	ID string `json:"id"`
+	// ID string `json:"id"`
 	Image []byte `json:"image"`
 }
 
 // https://stackoverflow.com/questions/56744834/how-do-i-get-file-url-after-put-file-to-amazon-s3-in-go
-func (u *S3Uploader) UploadImage(ctx context.Context, arg UploadImageParams) (string, error) {
-	result, err := u.Uploader.Upload(
+func (c *Client) UploadImage(ctx context.Context, arg UploadImageParams) (string, error) {
+	uploader := manager.NewUploader(c.client)
+
+	result, err := uploader.Upload(
 		ctx,
 		&s3.PutObjectInput{
 			Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-			Key:    aws.String(arg.ID),
+			Key:    aws.String(uuid.New().String()),
 			Body:   bytes.NewReader(arg.Image),
 		},
 	)
@@ -28,10 +35,17 @@ func (u *S3Uploader) UploadImage(ctx context.Context, arg UploadImageParams) (st
 	return result.Location, err
 }
 
-func (u *S3Uploader) DeleteImage(ctx context.Context, location string) error {
-	_, err := u.Uploader.DeleteObject(ctx, &s3.DeleteObjectInput{
+func (c *Client) DeleteImage(ctx context.Context, link string) error {
+	parsed, err := url.Parse(link)
+	if err != nil {
+		return err
+	}
+	imageID := strings.TrimPrefix(parsed.Path, "/")
+
+	_, err = c.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-		Key:    aws.String(location),
-	})
+		Key:    aws.String(imageID),
+		},
+	)
 	return err
 }

@@ -24,18 +24,18 @@ type Store interface {
 type DBStore struct {
 	*db.Queries
 	*mongodb.MongoOperations
-	*s3.Client
+	*bucket.Client
 	UserDB  *sql.DB
 	ImageDB *mongo.Database
 	// S3Uploader *manager.Uploader
 }
 
-func NewStore(userDB *sql.DB, imageDB *mongo.Database, s3Uploader *manager.Uploader) Store {
+func NewStore(userDB *sql.DB, imageDB *mongo.Database, s3Client *s3.Client) Store {
 	return &DBStore{
 		Queries: db.New(userDB),
 		MongoOperations: mongodb.NewMongo(imageDB),
 		UserDB: userDB,
 		ImageDB: imageDB,
-		S3Uploader: s3Uploader,
+		Client: s3Uploader,
 	}
 }
