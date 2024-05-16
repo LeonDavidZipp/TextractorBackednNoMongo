@@ -7,14 +7,6 @@ import (
 )
 
 
-// type MongoSession interface {
-// 	EndSession(context.Context) error
-// 	StartTransaction(...*options.TransactionOptions) error
-// 	AbortTransaction(context.Context) error
-// 	CommitTransaction(context.Context) error
-// 	WithTransaction(context.Context, func(mongo.SessionContext) error) error
-// }
-
 type MongoDBCollection interface {
 	InsertOne(context.Context, interface{}, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
 	FindOne(context.Context, interface{}, ...*options.FindOneOptions) *mongo.SingleResult
