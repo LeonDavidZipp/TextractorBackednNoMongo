@@ -8,8 +8,8 @@ import (
 // just first structure
 type S3Client interface {
 	UploadImage(ctx context.Context, arg UploadImageParams) (string, error)
-	DeleteImage()
-	DeleteImages()
+	GetImage(ctx context.Context, link string) ([]byte, error)
+	DeleteImages(ctx context.Context, links []string) error
 }
 
 func NewS3(cli S3Client) *Client {

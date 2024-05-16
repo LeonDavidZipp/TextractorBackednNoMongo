@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"os"
 	"github.com/google/uuid"
+	"io"
 )
 
 
@@ -35,6 +36,30 @@ func (c *Client) UploadImage(ctx context.Context, arg UploadImageParams) (string
 	return result.Location, err
 }
 
+func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
+	parsed, err := url.Parse(link)
+	if err != nil {
+		return nil, err
+	}
+	key := strings.TrimPrefix(parsed.Path, "/")
+
+	result, err := basics.S3Client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer result.Body.Close()
+
+	imageData, err := io.ReadAll(result.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return imageData, nil
+}
+
 func (c *Client) DeleteImages(ctx context.Context, links []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, link := range links {
@@ -52,14 +77,4 @@ func (c *Client) DeleteImages(ctx context.Context, links []string) error {
 		},
 	)
 	return err
-}
-
-func (c *Client) DeleteImages(ctx context.Context, links []string) error {
-	for _, link := range links {
-		err := c.DeleteImage(ctx, link)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
