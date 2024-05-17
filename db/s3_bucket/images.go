@@ -4,10 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
-	"strings"
-	"net/url"
 	"bytes"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -20,7 +17,7 @@ type UploadImageResult struct {
 	Text string `json:"text"`
 }
 
-func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (string, error) {
+func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (UploadImageResult, error) {
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Key:    aws.String(uuid.New().String()),
@@ -35,7 +32,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (s
 		return "", err
 	}
 	
-	link := LinkFromKey(*input.Key)
+	link := LinkFromKey(ctx, *input.Key)
 
 	text, err := c.ExtractText(ctx, link)
 	if err != nil {
@@ -51,7 +48,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (s
 }
 
 func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
-	key, err := KeyFromLink(link)
+	key, err := KeyFromLink(ctx, link)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +73,7 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 func (c *Client) DeleteImages(ctx context.Context, links []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, link := range links {
-		key, err := KeyFromLink(parsed.Path)
+		key, err := KeyFromLink(ctx, parsed.Path)
 		if err != nil {
 			return err
 		}
