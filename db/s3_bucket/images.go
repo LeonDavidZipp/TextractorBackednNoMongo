@@ -29,12 +29,12 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (U
 		input,
 	)
 	if err != nil {
-		return "", err
+		return UploadImageResult{}, err
 	}
 	
 	link := LinkFromKey(ctx, *input.Key)
 
-	text, err := c.ExtractText(ctx, link)
+	text, err := ExtractText(ctx, link)
 	if err != nil {
 		return UploadImageResult{}, err
 	}
@@ -73,7 +73,7 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 func (c *Client) DeleteImages(ctx context.Context, links []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, link := range links {
-		key, err := KeyFromLink(ctx, parsed.Path)
+		key, err := KeyFromLink(ctx, link)
 		if err != nil {
 			return err
 		}
