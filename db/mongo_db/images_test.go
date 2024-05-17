@@ -22,7 +22,7 @@ var exampleImage1 string
 var exampleImage2 string
 
 func insertImage(t *testing.T, image64 string, accountID int64) Image {
-	exampleImage1 = encodeImageToBase64("./sample.jpeg")
+	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
 	arg := InsertImageParams{
 		AccountID: accountID,
 		Text: util.RandomString(100),
@@ -49,7 +49,7 @@ func TestInsertImage(t *testing.T) {
 }
 
 func TestFindImage(t *testing.T) {
-	exampleImage1 = encodeImageToBase64("./sample.jpeg")
+	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
 	ctx := context.Background()
 
 	image1 := insertImage(t, exampleImage1, 1)
@@ -65,7 +65,7 @@ func TestFindImage(t *testing.T) {
 }
 
 func TestListImages(t *testing.T) {
-	exampleImage1 = encodeImageToBase64("./sample.jpeg")
+	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
 	for i := 0; i < 10; i++ {
 		insertImage(t, exampleImage1, 1)
 	}
@@ -88,7 +88,7 @@ func TestListImages(t *testing.T) {
 }
 
 func TestUpdateImage(t *testing.T) {
-	exampleImage1 = encodeImageToBase64("./sample.jpeg")
+	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
 	image1 := insertImage(t, exampleImage1, 1)
 	arg := UpdateImageParams{
 		ImageID: image1.ID,
@@ -110,7 +110,7 @@ func TestUpdateImage(t *testing.T) {
 }
 
 func TestDeleteImage(t *testing.T) {
-	exampleImage1 = encodeImageToBase64("./sample.jpeg")
+	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
 	image1 := insertImage(t, exampleImage1, 1)
 
 	ctx := context.Background()
@@ -123,8 +123,8 @@ func TestDeleteImage(t *testing.T) {
 }
 
 func TestDeleteImages(t *testing.T) {
-	exampleImage1 = encodeImageToBase64("./sample.jpeg")
-	exampleImage2 = encodeImageToBase64("./text.png")
+	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
+	exampleImage2 = encodeImageToBase64("../../test_files/text.png")
 	image1 := insertImage(t, exampleImage1, 1)
 	image2 := insertImage(t, exampleImage2, 1)
 
