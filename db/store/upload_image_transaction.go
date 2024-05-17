@@ -28,11 +28,17 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 	err := store.execTransaction(
 		ctx,
 		func(c *bucket.Client) error {
-			link, text, err := c.UploadImage(ctx, arg.ImageData)
-			return err
-		},
-		func(op *bucket.Client) error {
+			result, err := c.UploadAndExtractImage(ctx, arg.ImageData)
+			if err != nil {
+				return err
+			}
+
+			link = result.Link
+			text = result.Text
 			return nil
+		},
+		func(c *bucket.Client) error {
+			return c.DeleteImage(ctx, []string{link})
 		},
 		func(q *db.Queries) error {
 			var err error
