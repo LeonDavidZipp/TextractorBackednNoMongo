@@ -119,7 +119,7 @@ func TestDeleteImages(t *testing.T) {
 	image2 := insertImage(t, 1)
 
 	ctx := context.Background()
-	err := testImageOperations.DeleteImages(ctx, []primitive.ObjectID{image1.ID, image2.ID})
+	err := testImageOperations.DeleteImagesFromMongo(ctx, []primitive.ObjectID{image1.ID, image2.ID})
 	require.NoError(t, err)
 
 	image1Del, err := testImageOperations.FindImage(ctx, image1.ID)

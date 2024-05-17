@@ -24,7 +24,7 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 	err := store.execTransaction(
 		ctx,
 		func(c *bucket.Client) error {
-			return c.DeleteImages(ctx, arg.Links)
+			return c.DeleteImagesFromS3(ctx, arg.Links)
 		},
 		func(op *bucket.Client) error {
 			return nil
@@ -39,7 +39,7 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 			return err
 		},
 		func(op *mongodb.MongoOperations) error {
-			return op.DeleteImages(ctx, arg.ImageIDs)
+			return op.DeleteImagesFromMongo(ctx, arg.ImageIDs)
 		},
 	)
 	if err != nil {

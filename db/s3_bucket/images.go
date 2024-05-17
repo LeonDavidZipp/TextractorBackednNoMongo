@@ -70,7 +70,7 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 	return imageData, nil
 }
 
-func (c *Client) DeleteImages(ctx context.Context, links []string) error {
+func (c *Client) DeleteImagesFromS3(ctx context.Context, links []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, link := range links {
 		key, err := KeyFromLink(ctx, link)

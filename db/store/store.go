@@ -31,7 +31,7 @@ func NewStore(userDB *sql.DB, imageDB *mongo.Database, s3Client *s3.Client) Stor
 	return &DBStore{
 		Queries: db.New(userDB),
 		MongoOperations: mongodb.NewMongo(imageDB),
-		Client: s3Client,
+		Client: bucket.NewS3(s3Client),
 		UserDB: userDB,
 		ImageDB: imageDB,
 	}
