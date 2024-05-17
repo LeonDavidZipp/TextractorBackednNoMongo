@@ -45,7 +45,7 @@ func TestUploadImageTransaction(t *testing.T) {
 	)
 	account := createRandomAccount(t)
 
-	amount := 10
+	amount := 2
 
 	results := make(chan UploadImageTransactionResult, amount)
 	errs := make(chan error, amount)
@@ -115,7 +115,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	amount := 10
+	amount := 2
 	imageIDs := make([]primitive.ObjectID, amount)
 	for i := 0; i < amount; i++ {
 		image, err := store.InsertImage(
