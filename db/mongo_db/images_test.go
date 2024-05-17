@@ -2,8 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/base64"
-	"io/ioutil"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/LeonDavidZipp/Textractor/util"
 	"testing"
