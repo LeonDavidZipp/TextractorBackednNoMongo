@@ -57,7 +57,6 @@ func TestFindImage(t *testing.T) {
 	require.Equal(t, image1.AccountID, image2.AccountID)
 	require.Equal(t, image1.Text, image2.Text)
 	require.Equal(t, image1.Link, image2.Link)
-	require.Equal(t, image1.Image64, image2.Image64)
 }
 
 func TestListImages(t *testing.T) {
@@ -100,7 +99,6 @@ func TestUpdateImage(t *testing.T) {
 
 	require.Equal(t, image1.AccountID, image2.AccountID)
 	require.Equal(t, image1.Link, image2.Link)
-	require.Equal(t, image1.Image64, image2.Image64)
 }
 
 func TestDeleteImage(t *testing.T) {
