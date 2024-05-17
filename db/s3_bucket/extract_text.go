@@ -18,7 +18,8 @@ func ExtractText(ctx context.Context, link string) (string, error) {
 		Document: &textract.Document{
 			S3Object: &textract.S3Object{
 				Bucket: aws.String("AWS_BUCKET_NAME"),
-				Name:   aws.String("my-object-key"),
+				Name:   aws.String(KeyFromLink(link),
+				),
 			},
 		},
 	})
