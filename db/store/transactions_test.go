@@ -62,7 +62,6 @@ func TestUploadImageTransaction(t *testing.T) {
 					AccountID: account.ID,
 					Text: "some text",
 					Link: "some link",
-					Image64: "some image",
 				},
 			)
 

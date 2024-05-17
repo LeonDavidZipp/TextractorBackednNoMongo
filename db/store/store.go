@@ -25,7 +25,6 @@ type DBStore struct {
 	*bucket.Client
 	UserDB  *sql.DB
 	ImageDB *mongo.Database
-	// S3Uploader *manager.Uploader
 }
 
 func NewStore(userDB *sql.DB, imageDB *mongo.Database, s3Client *s3.Client) Store {

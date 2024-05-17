@@ -21,7 +21,8 @@ import (
 
 type insertImageRequest struct {
 	AccountID int64  `json:"account_id" binding:"required"`
-	Filepath  string `json:"filepath" binding:"required"`
+	// Filepath  string `json:"filepath" binding:"required"`
+	ImageData []byte `json:"image_data" binding:"required"`
 }
 
 func (s *Server) insertImage(ctx *gin.Context) {
@@ -36,7 +37,6 @@ func (s *Server) insertImage(ctx *gin.Context) {
 		AccountID: req.AccountID,
 		Text: req.Text,
 		Link: req.Link,
-		Image64: req.Image64,
 	}
 
 	result, err := s.store.UploadImageTransaction(ctx, arg)

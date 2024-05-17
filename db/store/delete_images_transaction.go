@@ -4,8 +4,8 @@ import (
 	"context"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 
@@ -23,10 +23,10 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 
 	err := store.execTransaction(
 		ctx,
-		func(c *s3.Client) error {
-			return c.DeleteImages(ctx, arg.ImageIDs)
+		func(c *bucket.Client) error {
+			return c.DeleteImages(ctx, arg.Links)
 		},
-		func(op *s3.Client) error {
+		func(op *bucket.Client) error {
 			return nil
 		},
 		func(q *db.Queries) error {

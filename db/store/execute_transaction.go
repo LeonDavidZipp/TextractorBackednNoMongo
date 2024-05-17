@@ -5,15 +5,15 @@ import (
 	"fmt"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 	"go.mongodb.org/mongo-driver/mongo"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 
 func (store *DBStore) execTransaction(
 	ctx context.Context,
-	fnS3 func(*s3.Client) error,
-	rollbackS3 func(*s3.Client) error,
+	fnS3 func(*bucket.Client) error,
+	rollbackS3 func(*bucket.Client) error,
 	fnSql func(*db.Queries) error,
 	fnMongo func(*mongodb.MongoOperations) error,
 ) error {

@@ -15,7 +15,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func (c *Client) UploadImage(ctx context.Context, imageData []byte) (string, error) {
+type UploadImageResult struct {
+	Link string `json:"link"`
+	Text string `json:"text"`
+}
+
+func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (string, error) {
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Key:    aws.String(uuid.New().String()),
@@ -30,9 +35,19 @@ func (c *Client) UploadImage(ctx context.Context, imageData []byte) (string, err
 		return "", err
 	}
 	
-	location := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", *input.Bucket, *input.Key)
+	link := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", *input.Bucket, *input.Key)
 
-	return location, nil
+	text, err := c.ExtractText(ctx, link)
+	if err != nil {
+		return UploadImageResult{}, err
+	}
+	
+	result := UploadImageResult{
+		Link: link,
+		Text: text,
+	}
+
+	return result, nil
 }
 
 func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {

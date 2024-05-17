@@ -4,14 +4,13 @@ import (
 	"context"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 )
 
 
 type UploadImageTransactionParams struct {
 	AccountID int64  `json:"account_id"`
-	Text      string `json:"text"`
-	Link      string `json:"link"`
-	Image64   string `json:"image_64"`
+	ImageData []byte `json:"image_data"`
 }
 
 type UploadImageTransactionResult struct {
@@ -23,9 +22,18 @@ type UploadImageTransactionResult struct {
 func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
 	var uploader db.Account
 	var image mongodb.Image
+	var link string
+	var text string
 
 	err := store.execTransaction(
 		ctx,
+		func(c *bucket.Client) error {
+			link, text, err := c.UploadImage(ctx, arg.ImageData)
+			return err
+		},
+		func(op *bucket.Client) error {
+			return nil
+		},
 		func(q *db.Queries) error {
 			var err error
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
@@ -38,9 +46,8 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			var err error
 			image, err = op.InsertImage(ctx, mongodb.InsertImageParams{
 				AccountID: arg.AccountID,
-				Text: arg.Text,
-				Link: arg.Link,
-				Image64: arg.Image64,
+				Text: text,
+				Link: link,
 			})
 			return err
 		},

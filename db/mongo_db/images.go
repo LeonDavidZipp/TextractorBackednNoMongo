@@ -13,7 +13,6 @@ type InsertImageParams struct {
 	Text      string `bson:"text" json:"text"`
 	// link to the image in s3 storage
 	Link      string `bson:"link" json:"link"`
-	Image64   string `bson:"image_64" json:"image_64"`
 }
 
 // InsertImage inserts a new image into the database
@@ -29,7 +28,6 @@ func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParam
 		AccountID: arg.AccountID,
 		Text:      arg.Text,
 		Link:      arg.Link,
-		Image64:   arg.Image64,
 	}
 
 	return image, nil
