@@ -11,13 +11,6 @@ import (
 )
 
 
-func encodeImageToBase64(filepath string) string {
-	imageData, _ := ioutil.ReadFile(filepath)
-	base64Image := base64.StdEncoding.EncodeToString(imageData)
-
-	return base64Image
-}
-
 var exampleImage1 string
 var exampleImage2 string
 
@@ -102,7 +95,6 @@ func TestUpdateImage(t *testing.T) {
 }
 
 func TestDeleteImage(t *testing.T) {
-	exampleImage1 = encodeImageToBase64("../../test_files/sample.jpeg")
 	image1 := insertImage(t, 1)
 
 	ctx := context.Background()

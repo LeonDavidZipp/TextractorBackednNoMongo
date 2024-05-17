@@ -41,6 +41,7 @@ func TestUploadImageTransaction(t *testing.T) {
 	store := NewStore(
 		testAccountDB,
 		testImageDB,
+		testImageClient,
 	)
 	account := createRandomAccount(t)
 
@@ -60,8 +61,7 @@ func TestUploadImageTransaction(t *testing.T) {
 				ctx,
 				UploadImageTransactionParams{
 					AccountID: account.ID,
-					Text: "some text",
-					Link: "some link",
+					ImageData: []byte(testImage),
 				},
 			)
 
@@ -102,6 +102,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	store := NewStore(
 		testAccountDB,
 		testImageDB,
+		testImageClient,
 	)
 	ctx := context.Background()
 	

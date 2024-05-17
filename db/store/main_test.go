@@ -11,6 +11,8 @@ import (
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 var testAccountQueries *db.Queries
@@ -18,6 +20,8 @@ var testAccountDB *sql.DB
 
 var testImageOperations *mongodb.MongoOperations
 var testImageDB *mongo.Database
+
+var testImageClient *s3.Client
 
 func TestMain(m *testing.M) {
 	ctx := context.Background()
@@ -48,6 +52,16 @@ func TestMain(m *testing.M) {
 	}
 
 	testImageOperations = mongodb.NewMongo(testImageDB)
+
+	config, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion(os.Getenv("AWS_REGION")),
+	)
+	if err != nil {
+		log.Fatal("Cannot load AWS config:", err)
+	}
+
+	testImageClient = s3.NewFromConfig(config)
 
 	os.Exit(m.Run())
 }

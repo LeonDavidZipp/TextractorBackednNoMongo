@@ -26,8 +26,7 @@ func (s *Server) insertImage(ctx *gin.Context) {
 
 	arg := st.UploadImageTransactionParams{
 		AccountID: req.AccountID,
-		Text: req.Text,
-		Link: req.Link,
+		ImageData: req.ImageData,
 	}
 
 	result, err := s.store.UploadImageTransaction(ctx, arg)
@@ -151,7 +150,7 @@ func (s *Server) deleteImages(ctx *gin.Context) {
 		return
 	}
 
-	err := s.store.DeleteImages(ctx, req.ImageIDs)
+	err := s.store.DeleteImagesFromMongo(ctx, req.ImageIDs)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
