@@ -35,7 +35,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (s
 		return "", err
 	}
 	
-	link := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", *input.Bucket, *input.Key)
+	link := LinkFromKey(*input.Key)
 
 	text, err := c.ExtractText(ctx, link)
 	if err != nil {
@@ -51,11 +51,10 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (s
 }
 
 func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
-	parsed, err := url.Parse(link)
+	key, err := KeyFromLink(link)
 	if err != nil {
 		return nil, err
 	}
-	key := strings.TrimPrefix(parsed.Path, "/")
 
 	result, err := c.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
@@ -77,11 +76,11 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 func (c *Client) DeleteImages(ctx context.Context, links []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, link := range links {
-		parsed, err := url.Parse(link)
+		key, err := KeyFromLink(parsed.Path)
 		if err != nil {
 			return err
 		}
-		key := strings.TrimPrefix(parsed.Path, "/")
+
 		objectIds = append(objectIds, types.ObjectIdentifier{Key: aws.String(key)})
 	}
 
