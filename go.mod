@@ -31,6 +31,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.20.8 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.24.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/textract v1.30.8 // indirect
 	github.com/aws/smithy-go v1.20.2 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
