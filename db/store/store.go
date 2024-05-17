@@ -6,8 +6,6 @@ import (
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	"go.mongodb.org/mongo-driver/mongo"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 )
