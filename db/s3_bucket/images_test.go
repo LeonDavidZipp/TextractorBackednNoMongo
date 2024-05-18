@@ -10,21 +10,6 @@ import (
 )
 
 
-func imageToBytes(imagePath string) ([]byte, error) {
-	file, err := os.Open(imagePath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes, nil
-}
-
 func uploadImage(t *testing.T, imagePath string) string {
 	ctx := context.Background()
 
