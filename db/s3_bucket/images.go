@@ -17,41 +17,6 @@ type UploadImageResult struct {
 	Text string `json:"text"`
 }
 
-// func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
-// 	f, err := image.Open()
-// 	if err != nil {
-// 		return UploadImageResult{}, err
-// 	}
-
-// 	input := &s3.PutObjectInput{
-// 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-// 		Key:    aws.String(uuid.New().String()),
-// 		Body:   f,
-// 	}
-
-// 	_, err := c.PutObject(
-// 		ctx,
-// 		input,
-// 	)
-// 	if err != nil {
-// 		return UploadImageResult{}, err
-// 	}
-	
-// 	link := LinkFromKey(ctx, *input.Key)
-
-// 	text, err := ExtractText(ctx, link)
-// 	if err != nil {
-// 		return UploadImageResult{}, err
-// 	}
-	
-// 	result := UploadImageResult{
-// 		Link: link,
-// 		Text: text,
-// 	}
-
-// 	return result, nil
-// }
-
 func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
 	img, err := image.Open()
 	if err != nil {
