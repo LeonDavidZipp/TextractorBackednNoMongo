@@ -5,6 +5,7 @@ import (
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
+	"mime/multipart"
 )
 
 
