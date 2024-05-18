@@ -9,8 +9,8 @@ import (
 
 
 type UploadImageTransactionParams struct {
-	AccountID int64  `json:"account_id"`
-	ImageData []byte `json:"image_data"`
+	AccountID int64                 `json:"account_id"`
+	File      *multipart.FileHeader `json:"file"`
 }
 
 type UploadImageTransactionResult struct {
@@ -28,7 +28,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 	err := store.execTransaction(
 		ctx,
 		func(c *bucket.Client) error {
-			result, err := c.UploadAndExtractImage(ctx, arg.ImageData)
+			result, err := c.UploadAndExtractImage(ctx, arg.File)
 			if err != nil {
 				return err
 			}
