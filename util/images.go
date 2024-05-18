@@ -2,8 +2,12 @@ package util
 
 import (
 	"os"
+	"io"
+	"bytes"
+	"errors"
+	"path/filepath"
+	"mime"
 	"mime/multipart"
-	"net/textproto"
 )
 
 
@@ -14,11 +18,15 @@ func ImageAsFileHeader(filePath string) (*multipart.FileHeader, error) {
 	}
 	defer file.Close()
 
-	fileHeader := &multipart.FileHeader{
-		Filename: filePath,
-		Size: 0,
-		Header: textproto.MIMEHeader{},
-	}
+	writer := multipart.NewWriter(body)
+	defer writer.Close()
 
-	return fileHeader, nil
+	formWriter, err := writer.CreateFormFile("image", "image.jpg")
+
+	_, err = io.Copy(formWriter, file)
+	if err != nil {
+		return {}, err
+	}
 }
+
+

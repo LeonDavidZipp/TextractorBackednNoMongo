@@ -45,7 +45,7 @@ func TestUploadImageTransaction(t *testing.T) {
 
 	account := createRandomAccount(t)
 
-	image, err := util.ImageAsFileHeader("../../test_files/sample.jpeg")
+	image, err := util.ImageAsFileHeader("../test_files/sample.jpeg")
 	require.NoError(t, err)
 
 	amount := 2
@@ -54,7 +54,6 @@ func TestUploadImageTransaction(t *testing.T) {
 	errs := make(chan error, amount)
 	defer close(results)
 	defer close(errs)
-
 
 	for i := 0; i < amount; i++ {
 		go func() {

@@ -61,11 +61,9 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-		Key:    aws.String(uuid.New().String()),
+		Key:    aws.String(image.Filename + uuid.New().String()),
 		Body:   img,
 	}
-
-	// uploader := manager.NewUploader(c)
 
 	uploadResult, err := c.Uploader.Upload(
 		ctx,
