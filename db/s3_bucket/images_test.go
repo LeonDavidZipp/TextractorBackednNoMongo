@@ -8,8 +8,8 @@ import (
 )
 
 
-// /Users/lzipp/Desktop/Textractor/Backend/test_files/sample.jpeg
 // /Users/lzipp/Desktop/Textractor/Backend/db/s3_bucket/images_test.go
+// /Users/lzipp/Desktop/Textractor/Backend/test_files/sample.jpeg
 
 func uploadImage(t *testing.T, imagePath string) string {
 	ctx := context.Background()
