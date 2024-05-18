@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/google/uuid"
 	"mime/multipart"
 )
@@ -18,8 +17,8 @@ type UploadImageResult struct {
 	Text string `json:"text"`
 }
 
-// func (c *Client) UploadAndExtractImage(ctx context.Context, file *multipart.FileHeader) (UploadImageResult, error) {
-// 	f, err := file.Open()
+// func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
+// 	f, err := image.Open()
 // 	if err != nil {
 // 		return UploadImageResult{}, err
 // 	}
@@ -53,22 +52,22 @@ type UploadImageResult struct {
 // 	return result, nil
 // }
 
-func (c *Client) UploadAndExtractImage(ctx context.Context, file *multipart.FileHeader) (UploadImageResult, error) {
-	f, err := file.Open()
+func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
+	img, err := image.Open()
 	if err != nil {
 		return UploadImageResult{}, err
 	}
-	defer f.Close()
+	defer img.Close()
 
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Key:    aws.String(uuid.New().String()),
-		Body:   f,
+		Body:   img,
 	}
 
-	uploader := manager.NewUploader(c)
+	// uploader := manager.NewUploader(c)
 
-	uploadResult, err := uploader.Upload(
+	uploadResult, err := c.Uploader.Upload(
 		ctx,
 		input,
 	)

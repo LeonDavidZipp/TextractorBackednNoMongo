@@ -3,6 +3,7 @@ package db
 import (
 	"os"
 	"io"
+	"github.com/LeonDavidZipp/Textractor/util"
 	"context"
 	"testing"
 	"github.com/stretchr/testify/require"
@@ -27,10 +28,10 @@ func imageToBytes(imagePath string) ([]byte, error) {
 func uploadImage(t *testing.T, imagePath string) string {
 	ctx := context.Background()
 
-	imageBytes, err := imageToBytes(imagePath)
+	image, err := util.ImageAsFileHeader(imagePath)
 	require.NoError(t, err)
 
-	result, err := testImageClient.UploadAndExtractImage(ctx, imageBytes)
+	result, err := testImageClient.UploadAndExtractImage(ctx, image)
 	link := result.Link
 	text := result.Text
 

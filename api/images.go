@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"errors"
+	"mime/multipart"
 	"github.com/gin-gonic/gin"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,11 +11,11 @@ import (
 	st "github.com/LeonDavidZipp/Textractor/db/store"
 )
 
-type insertImageRequest struct {
-	AccountID int64  `json:"account_id" binding:"required"`
-	// Filepath  string `json:"filepath" binding:"required"`
-	ImageData []byte `json:"image_data" binding:"required"`
-}
+// type insertImageRequest struct {
+// 	AccountID int64  `json:"account_id" binding:"required"`
+// 	// Filepath  string `json:"filepath" binding:"required"`
+// 	ImageData []byte `json:"image_data" binding:"required"`
+// }
 
 // func (s *Server) insertImage(ctx *gin.Context) {
 // 	var req insertImageRequest
@@ -38,22 +39,22 @@ type insertImageRequest struct {
 // 	ctx.JSON(http.StatusOK, result)
 // }
 
-func (s *Server) insertImage(ctx *gin.Context) {
-	file, err := ctx.FormFile("file")
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
+type insertImageRequest struct {
+	AccountID int64                 `form:"account_id" binding:"required"`
+	Image     *multipart.FileHeader `form:"image" binding:"required"`
+}
 
-	accountID := ctx.PostForm("account_id")
-	if accountID == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "account_id is required"})
+func (s *Server) insertImage(ctx *gin.Context) {
+	var req insertImageRequest
+	
+	if err := ctx.ShouldBind(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := st.UploadImageTransactionParams{
-		AccountID: accountID,
-		File: file,
+		AccountID: req.AccountID,
+		Image: req.Image,
 	}
 
 	result, err := s.store.UploadImageTransaction(ctx, arg)
