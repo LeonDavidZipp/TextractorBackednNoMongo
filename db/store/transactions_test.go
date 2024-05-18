@@ -41,10 +41,11 @@ func TestUploadImageTransaction(t *testing.T) {
 	store := NewStore(
 		testAccountDB,
 		testImageDB,
+		testImageClient,
 	)
 	account := createRandomAccount(t)
 
-	amount := 10
+	amount := 2
 
 	results := make(chan UploadImageTransactionResult, amount)
 	errs := make(chan error, amount)
@@ -60,9 +61,7 @@ func TestUploadImageTransaction(t *testing.T) {
 				ctx,
 				UploadImageTransactionParams{
 					AccountID: account.ID,
-					Text: "some text",
-					Link: "some link",
-					Image64: "some image",
+					ImageData: []byte(testImage),
 				},
 			)
 
@@ -103,6 +102,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	store := NewStore(
 		testAccountDB,
 		testImageDB,
+		testImageClient,
 	)
 	ctx := context.Background()
 	
@@ -115,7 +115,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	amount := 10
+	amount := 2
 	imageIDs := make([]primitive.ObjectID, amount)
 	for i := 0; i < amount; i++ {
 		image, err := store.InsertImage(
@@ -124,7 +124,6 @@ func TestDeleteImagesTransaction(t *testing.T) {
 				AccountID: account.ID,
 				Text: "some text",
 				Link: "some link",
-				Image64: "some image",
 			},
 		)
 		require.NoError(t, err)

@@ -13,11 +13,9 @@ type InsertImageParams struct {
 	Text      string `bson:"text" json:"text"`
 	// link to the image in s3 storage
 	Link      string `bson:"link" json:"link"`
-	Image64   string `bson:"image_64" json:"image_64"`
 }
 
 // InsertImage inserts a new image into the database
-// TODO: implement not for Store but for Mongo "Queries"
 func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParams) (Image, error) {
 	inserted, err := op.db.Collection("imagedb").InsertOne(ctx, arg)
 
@@ -30,7 +28,6 @@ func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParam
 		AccountID: arg.AccountID,
 		Text:      arg.Text,
 		Link:      arg.Link,
-		Image64:   arg.Image64,
 	}
 
 	return image, nil
@@ -113,7 +110,7 @@ func (op *MongoOperations) DeleteImage(ctx context.Context, id primitive.ObjectI
 	return nil
 }
 
-func (op *MongoOperations) DeleteImages(ctx context.Context, ids []primitive.ObjectID) error {
+func (op *MongoOperations) DeleteImagesFromMongo(ctx context.Context, ids []primitive.ObjectID) error {
 	filter := bson.M{"_id": bson.M{"$in": ids}}
 
 	_, err := op.db.Collection("imagedb").DeleteMany(ctx, filter)
