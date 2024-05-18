@@ -18,10 +18,11 @@ func uploadImage(t *testing.T, imagePath string) string {
 	require.NoError(t, err)
 
 	result, err := testImageClient.UploadAndExtractImage(ctx, image)
+	require.NoError(t, err)
+
 	link := result.Link
 	text := result.Text
 
-	require.NoError(t, err)
 	require.NotEmpty(t, link)
 	require.NotEmpty(t, text)
 
