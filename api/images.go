@@ -16,17 +16,44 @@ type insertImageRequest struct {
 	ImageData []byte `json:"image_data" binding:"required"`
 }
 
-func (s *Server) insertImage(ctx *gin.Context) {
-	var req insertImageRequest
+// func (s *Server) insertImage(ctx *gin.Context) {
+// 	var req insertImageRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+// 		return
+// 	}
+
+// 	arg := st.UploadImageTransactionParams{
+// 		AccountID: req.AccountID,
+// 		ImageData: req.ImageData,
+// 	}
+
+// 	result, err := s.store.UploadImageTransaction(ctx, arg)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 		return
+// 	}
+
+// 	ctx.JSON(http.StatusOK, result)
+// }
+
+func (s *Server) insertImage(ctx *gin.Context) {
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	accountID := ctx.PostForm("account_id")
+	if accountID == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "account_id is required"})
 		return
 	}
 
 	arg := st.UploadImageTransactionParams{
-		AccountID: req.AccountID,
-		ImageData: req.ImageData,
+		AccountID: accountID,
+		File: file,
 	}
 
 	result, err := s.store.UploadImageTransaction(ctx, arg)
