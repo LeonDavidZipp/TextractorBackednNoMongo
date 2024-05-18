@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/textract"
 	"github.com/aws/aws-sdk-go-v2/service/textract/types"
+
+	"fmt"
 )
 
 func ExtractText(ctx context.Context, link string) (string, error) {
@@ -23,6 +25,7 @@ func ExtractText(ctx context.Context, link string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("\n\n\nKey: ", key)
 
 	client := textract.NewFromConfig(config)
 	result, err := client.DetectDocumentText(ctx, &textract.DetectDocumentTextInput{

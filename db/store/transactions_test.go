@@ -45,7 +45,7 @@ func TestUploadImageTransaction(t *testing.T) {
 
 	account := createRandomAccount(t)
 
-	image, err := util.ImageAsFileHeader("../test_files/sample.jpeg")
+	image, err := util.ImageAsFileHeader("../../test_files/sample.jpeg")
 	require.NoError(t, err)
 
 	amount := 2

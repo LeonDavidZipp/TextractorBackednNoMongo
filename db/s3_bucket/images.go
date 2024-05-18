@@ -4,12 +4,13 @@ import (
 	"context"
 	"io"
 	"os"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/google/uuid"
 	"mime/multipart"
+
+	"fmt"
 )
 
 type UploadImageResult struct {
@@ -26,7 +27,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-		Key:    aws.String(image.Filename + uuid.New().String()),
+		Key:    aws.String(fmt.Sprintf("%s_orig_name_after_%s", uuid.New().String(), image.Filename)),
 		Body:   img,
 	}
 
@@ -39,6 +40,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 
 	link := uploadResult.Location
+	fmt.Println("\n\n\nLink: ", link)
 
 	text, err := ExtractText(ctx, link)
 	if err != nil {
