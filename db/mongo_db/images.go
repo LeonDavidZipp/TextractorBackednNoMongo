@@ -110,7 +110,7 @@ func (op *MongoOperations) DeleteImage(ctx context.Context, id primitive.ObjectI
 	return nil
 }
 
-func (op *MongoOperations) DeleteImages(ctx context.Context, ids []primitive.ObjectID) error {
+func (op *MongoOperations) DeleteImagesFromMongo(ctx context.Context, ids []primitive.ObjectID) error {
 	filter := bson.M{"_id": bson.M{"$in": ids}}
 
 	_, err := op.db.Collection("imagedb").DeleteMany(ctx, filter)

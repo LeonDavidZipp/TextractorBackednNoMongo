@@ -18,5 +18,5 @@ func KeyFromLink(ctx context.Context, link string) (string, error) {
 }
 
 func LinkFromKey(ctx context.Context, key string) string {
-	return fmt.Sprintf("https://%s.s3.amazonaws.com/%s", os.Getenv("AWS_BUCKET_NAME"), key)
+	return fmt.Sprintf("https://s3.%s.amazonaws.com/%s/%s", os.Getenv("AWS_REGION"), os.Getenv("AWS_BUCKET_NAME"), key)
 }

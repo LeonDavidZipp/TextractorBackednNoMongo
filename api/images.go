@@ -10,15 +10,6 @@ import (
 	st "github.com/LeonDavidZipp/Textractor/db/store"
 )
 
-// Insert Image
-// type insertImageRequest struct {
-// 	AccountID int64  `json:"account_id" binding:"required"`
-// 	Text      string `bson:"text" json:"text"`
-// 	// link to the image in s3 storage
-// 	Link      string `bson:"link" json:"link"`
-// 	Image64   string `bson:"image_64" json:"image_64"`
-// }
-
 type insertImageRequest struct {
 	AccountID int64  `json:"account_id" binding:"required"`
 	// Filepath  string `json:"filepath" binding:"required"`
@@ -35,8 +26,7 @@ func (s *Server) insertImage(ctx *gin.Context) {
 
 	arg := st.UploadImageTransactionParams{
 		AccountID: req.AccountID,
-		Text: req.Text,
-		Link: req.Link,
+		ImageData: req.ImageData,
 	}
 
 	result, err := s.store.UploadImageTransaction(ctx, arg)
@@ -160,7 +150,7 @@ func (s *Server) deleteImages(ctx *gin.Context) {
 		return
 	}
 
-	err := s.store.DeleteImages(ctx, req.ImageIDs)
+	err := s.store.DeleteImagesFromMongo(ctx, req.ImageIDs)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

@@ -20,9 +20,9 @@ type S3Client interface {
 }
 
 func NewS3(cli S3Client) *Client {
-	return &Client{client: cli}
+	return &Client{S3Client: cli}
 }
 
 type Client struct {
-	client S3Client
+	S3Client
 }

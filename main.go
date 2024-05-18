@@ -11,10 +11,8 @@ import (
 	api "github.com/LeonDavidZipp/Textractor/api"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 
@@ -46,7 +44,10 @@ func main() {
 	}
 
 	// s3
-	config, err := config.LoadDefaultConfig(ctx)
+	config, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion(os.Getenv("AWS_REGION")),
+	)
 	if err != nil {
 		log.Fatal("Cannot load AWS config:", err)
 	}

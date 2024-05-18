@@ -24,7 +24,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (U
 		Body:   bytes.NewReader(imageData),
 	}
 	
-	_, err := c.client.PutObject(
+	_, err := c.PutObject(
 		ctx,
 		input,
 	)
@@ -53,7 +53,7 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 		return nil, err
 	}
 
-	result, err := c.client.GetObject(ctx, &s3.GetObjectInput{
+	result, err := c.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Key:    aws.String(key),
 	})
@@ -70,7 +70,7 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 	return imageData, nil
 }
 
-func (c *Client) DeleteImages(ctx context.Context, links []string) error {
+func (c *Client) DeleteImagesFromS3(ctx context.Context, links []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, link := range links {
 		key, err := KeyFromLink(ctx, link)
@@ -81,7 +81,7 @@ func (c *Client) DeleteImages(ctx context.Context, links []string) error {
 		objectIds = append(objectIds, types.ObjectIdentifier{Key: aws.String(key)})
 	}
 
-	_, err := c.client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+	_, err := c.DeleteObjects(ctx, &s3.DeleteObjectsInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Delete: &types.Delete{Objects: objectIds},
 		},

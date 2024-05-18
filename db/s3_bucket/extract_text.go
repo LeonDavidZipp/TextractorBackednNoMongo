@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"strings"
+	"os"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/textract"
@@ -10,7 +11,10 @@ import (
 )
 
 func ExtractText(ctx context.Context, link string) (string, error) {
-	config, err := config.LoadDefaultConfig(ctx)
+	config, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion(os.Getenv("AWS_REGION")),
+	)
 	if err != nil {
 		return "", err
 	}
