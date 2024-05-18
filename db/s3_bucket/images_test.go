@@ -29,13 +29,13 @@ func uploadImage(t *testing.T, imagePath string) string {
 }
 
 func TestUploadImage(t *testing.T) {
-	uploadImage(t, "../../test_files/sample.jpeg")
+	uploadImage(t, "/app/test_files/sample.jpeg")
 }
 
 func TestGetImage(t *testing.T) {
 	ctx := context.Background()
 
-	link := uploadImage(t, "../../test_files/sample.jpeg")
+	link := uploadImage(t, "/app/test_files/sample.jpeg")
 
 	imageBytes, err := testImageClient.GetImage(ctx, link)
 	require.NoError(t, err)
@@ -47,7 +47,7 @@ func TestDeleteImages(t *testing.T) {
 
 	links := make([]string, 10)
 	for i := 0; i < 10; i++ {
-		links[i] = uploadImage(t, "../../test_files/sample.jpeg")
+		links[i] = uploadImage(t, "/app/test_files/sample.jpeg")
 	}
 
 	err := testImageClient.DeleteImagesFromS3(ctx, links)
