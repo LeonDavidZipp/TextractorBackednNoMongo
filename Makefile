@@ -16,6 +16,9 @@ start:
 stop:
 	docker-compose down
 
+tidy:
+	docker-compose run --rm app go mod tidy
+
 #############################################################################################################################################################################
 #																																											#
 #	The following commands are used to manage the user database.																											#

@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"errors"
+	"mime/multipart"
 	"github.com/gin-gonic/gin"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,28 +11,50 @@ import (
 	st "github.com/LeonDavidZipp/Textractor/db/store"
 )
 
-// Insert Image
+// type insertImageRequest struct {
+// 	AccountID int64  `json:"account_id" binding:"required"`
+// 	// Filepath  string `json:"filepath" binding:"required"`
+// 	ImageData []byte `json:"image_data" binding:"required"`
+// }
+
+// func (s *Server) insertImage(ctx *gin.Context) {
+// 	var req insertImageRequest
+
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+// 		return
+// 	}
+
+// 	arg := st.UploadImageTransactionParams{
+// 		AccountID: req.AccountID,
+// 		ImageData: req.ImageData,
+// 	}
+
+// 	result, err := s.store.UploadImageTransaction(ctx, arg)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 		return
+// 	}
+
+// 	ctx.JSON(http.StatusOK, result)
+// }
+
 type insertImageRequest struct {
-	AccountID int64  `json:"account_id" binding:"required"`
-	Text      string `bson:"text" json:"text"`
-	// link to the image in s3 storage
-	Link      string `bson:"link" json:"link"`
-	Image64   string `bson:"image_64" json:"image_64"`
+	AccountID int64                 `form:"account_id" binding:"required"`
+	Image     *multipart.FileHeader `form:"image" binding:"required"`
 }
 
 func (s *Server) insertImage(ctx *gin.Context) {
 	var req insertImageRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := st.UploadImageTransactionParams{
 		AccountID: req.AccountID,
-		Text: req.Text,
-		Link: req.Link,
-		Image64: req.Image64,
+		Image: req.Image,
 	}
 
 	result, err := s.store.UploadImageTransaction(ctx, arg)
@@ -155,7 +178,7 @@ func (s *Server) deleteImages(ctx *gin.Context) {
 		return
 	}
 
-	err := s.store.DeleteImages(ctx, req.ImageIDs)
+	err := s.store.DeleteImagesFromMongo(ctx, req.ImageIDs)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

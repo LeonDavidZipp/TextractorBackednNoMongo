@@ -4,28 +4,43 @@ import (
 	"context"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
+	"mime/multipart"
 )
 
 
 type UploadImageTransactionParams struct {
-	AccountID int64  `json:"account_id"`
-	Text      string `json:"text"`
-	Link      string `json:"link"`
-	Image64   string `json:"image_64"`
+	AccountID int64                 `json:"account_id"`
+	Image     *multipart.FileHeader `json:"image"`
 }
 
 type UploadImageTransactionResult struct {
-	Image    mongodb.Image `json:"image"`
 	Uploader db.Account    `json:"uploader"`
+	Image    mongodb.Image `json:"image"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
-func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
+func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
 	var uploader db.Account
 	var image mongodb.Image
+	var link string
+	var text string
 
 	err := store.execTransaction(
 		ctx,
+		func(c *bucket.Client) error {
+			result, err := c.UploadAndExtractImage(ctx, arg.Image)
+			if err != nil {
+				return err
+			}
+
+			link = result.Link
+			text = result.Text
+			return nil
+		},
+		func(c *bucket.Client) error {
+			return c.DeleteImagesFromS3(ctx, []string{link})
+		},
 		func(q *db.Queries) error {
 			var err error
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
@@ -38,9 +53,8 @@ func (store *SQLMongoStore) UploadImageTransaction(ctx context.Context, arg Uplo
 			var err error
 			image, err = op.InsertImage(ctx, mongodb.InsertImageParams{
 				AccountID: arg.AccountID,
-				Text: arg.Text,
-				Link: arg.Link,
-				Image64: arg.Image64,
+				Text: text,
+				Link: link,
 			})
 			return err
 		},
