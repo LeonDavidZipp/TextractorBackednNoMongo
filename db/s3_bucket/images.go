@@ -43,7 +43,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	link := uploadResult.Location
 	fmt.Println("\n\n\nLink: ", link)
 
-	text, err := ExtractText(ctx, link)
+	text, err := ExtractText(ctx, *input.Key)
 	if err != nil {
 		return UploadImageResult{}, err
 	}

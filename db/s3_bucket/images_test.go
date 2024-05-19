@@ -5,6 +5,8 @@ import (
 	"context"
 	"testing"
 	"github.com/stretchr/testify/require"
+
+	"fmt"
 )
 
 
@@ -16,6 +18,7 @@ func uploadImage(t *testing.T, imagePath string) string {
 
 	image, err := util.ImageAsFileHeader(imagePath)
 	require.NoError(t, err)
+	fmt.Println("\n\n\nImage: ", image)
 
 	result, err := testImageClient.UploadAndExtractImage(ctx, image)
 	require.NoError(t, err)
