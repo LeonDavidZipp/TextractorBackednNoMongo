@@ -5,17 +5,18 @@ import (
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
+	"mime/multipart"
 )
 
 
 type UploadImageTransactionParams struct {
-	AccountID int64  `json:"account_id"`
-	ImageData []byte `json:"image_data"`
+	AccountID int64                 `json:"account_id"`
+	Image     *multipart.FileHeader `json:"image"`
 }
 
 type UploadImageTransactionResult struct {
-	Image    mongodb.Image `json:"image"`
 	Uploader db.Account    `json:"uploader"`
+	Image    mongodb.Image `json:"image"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
@@ -28,7 +29,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 	err := store.execTransaction(
 		ctx,
 		func(c *bucket.Client) error {
-			result, err := c.UploadAndExtractImage(ctx, arg.ImageData)
+			result, err := c.UploadAndExtractImage(ctx, arg.Image)
 			if err != nil {
 				return err
 			}

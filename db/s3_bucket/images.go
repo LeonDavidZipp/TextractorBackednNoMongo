@@ -4,12 +4,13 @@ import (
 	"context"
 	"io"
 	"os"
-	"bytes"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/google/uuid"
+	"mime/multipart"
+
+	"fmt"
 )
 
 type UploadImageResult struct {
@@ -17,24 +18,30 @@ type UploadImageResult struct {
 	Text string `json:"text"`
 }
 
-func (c *Client) UploadAndExtractImage(ctx context.Context, imageData []byte) (UploadImageResult, error) {
+func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
+	img, err := image.Open()
+	if err != nil {
+		return UploadImageResult{}, err
+	}
+	defer img.Close()
+
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
-		Key:    aws.String(uuid.New().String()),
-		Body:   bytes.NewReader(imageData),
+		Key:    aws.String(fmt.Sprintf("%s_orig_name_after_%s", uuid.New().String(), image.Filename)),
+		Body:   img,
 	}
-	
-	_, err := c.PutObject(
+
+	uploadResult, err := c.Uploader.Upload(
 		ctx,
 		input,
 	)
 	if err != nil {
 		return UploadImageResult{}, err
 	}
-	
-	link := LinkFromKey(ctx, *input.Key)
 
-	text, err := ExtractText(ctx, link)
+	link := uploadResult.Location
+
+	text, err := ExtractText(ctx, *input.Key)
 	if err != nil {
 		return UploadImageResult{}, err
 	}

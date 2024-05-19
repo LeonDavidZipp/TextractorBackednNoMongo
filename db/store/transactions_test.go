@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var testImage string
 
 func createRandomAccount(t *testing.T) db.Account {
 	arg := db.CreateAccountParams{
@@ -43,15 +42,16 @@ func TestUploadImageTransaction(t *testing.T) {
 		testImageDB,
 		testImageClient,
 	)
+
 	account := createRandomAccount(t)
+
+	image, err := util.ImageAsFileHeader("/app/test_files/sample.jpeg")
+	require.NoError(t, err)
 
 	amount := 2
 
 	results := make(chan UploadImageTransactionResult, amount)
 	errs := make(chan error, amount)
-	defer close(results)
-	defer close(errs)
-
 
 	for i := 0; i < amount; i++ {
 		go func() {
@@ -61,7 +61,7 @@ func TestUploadImageTransaction(t *testing.T) {
 				ctx,
 				UploadImageTransactionParams{
 					AccountID: account.ID,
-					ImageData: []byte(testImage),
+					Image: image,
 				},
 			)
 

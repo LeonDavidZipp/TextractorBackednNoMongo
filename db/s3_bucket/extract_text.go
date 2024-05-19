@@ -8,9 +8,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/textract"
 	"github.com/aws/aws-sdk-go-v2/service/textract/types"
+
+	"fmt"
 )
 
-func ExtractText(ctx context.Context, link string) (string, error) {
+func ExtractText(ctx context.Context, key string) (string, error) {
 	config, err := config.LoadDefaultConfig(
 		ctx,
 		config.WithRegion(os.Getenv("AWS_REGION")),
@@ -19,22 +21,17 @@ func ExtractText(ctx context.Context, link string) (string, error) {
 		return "", err
 	}
 
-	key, err := KeyFromLink(ctx, link)
-	if err != nil {
-		return "", err
-	}
-
 	client := textract.NewFromConfig(config)
 	result, err := client.DetectDocumentText(ctx, &textract.DetectDocumentTextInput{
 		Document: &types.Document{
 			S3Object: &types.S3Object{
-				Bucket: aws.String("AWS_BUCKET_NAME"),
+				Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 				Name:   aws.String(key),
 			},
 		},
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Failed to extract text from image: %v %s", err, key)
 	}
 
 	var documentText strings.Builder

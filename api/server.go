@@ -25,7 +25,7 @@ func NewServer(store st.Store) *Server {
 	router.DELETE("/accounts/:id", server.deleteAccount)
 	
 	// Images (Mongo)
-	router.POST("/accounts/images/", server.insertImage)
+	router.POST("/accounts/images", server.insertImage)
 	router.GET("accounts/images", server.listImages)
 	router.DELETE("/accounts/images", server.deleteImages)
 
