@@ -92,7 +92,24 @@ services:
           - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       env_file: .env
       networks:
-          - textractor_network
+        proxy:
+        textractor_network:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.keycloak.entrypoints=http"
+        - "traefik.http.routers.keycloak.rule=Host(`keycloak.jimsgarage.co.uk`)"
+        - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.keycloak.middlewares=keycloak-https-redirect"
+        - "traefik.http.routers.keycloak-secure.entrypoints=https"
+        - "traefik.http.routers.keycloak-secure.rule=Host(`keycloak.jimsgarage.co.uk`)*"
+        - "traefik.http.routers.keycloak-secure.tls=true"
+        - "traefik.http.routers.keycloak-secure.service=keycloak"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+        - "traefik.docker.network=proxy"
+networks:
+  proxy:
+    external: true
+  keycloak:
 
 volumes:
     user-data:
