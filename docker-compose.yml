@@ -16,6 +16,8 @@ services:
         volumes: # remove after testing
             - .:/app
         env_file: .env
+        networks:
+            - textractor_network
 
     db:
         image: "postgres:16.2-alpine3.19"
@@ -31,6 +33,8 @@ services:
             - POSTGRES_USER=${POSTGRES_USER}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
         env_file: .env
+        networks:
+            - textractor_network
 
     mongo-db:
         build:
@@ -48,29 +52,43 @@ services:
             - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
         env_file: .env
+        networks:
+            - textractor_network
 
-    cache:
-        image: redis:latest
-        container_name: cache
-        restart: unless-stopped
-        expose:
-            - ${REDIS_PORT}
-        ports:
-            - ${REDIS_PORT}:${REDIS_PORT}
-        volumes:
-            - cache-data:/data
-        env_file: .env
+    # cache:
+    #     image: redis:latest
+    #     container_name: cache
+    #     restart: unless-stopped
+    #     expose:
+    #         - ${REDIS_PORT}
+    #     ports:
+    #         - ${REDIS_PORT}:${REDIS_PORT}
+    #     volumes:
+    #         - cache-data:/data
+    #     env_file: .env
+    #     networks:
+    #         - textractor_network
 
-    # auth:
-    #   image: keycloak:latest
-    #   container_name: auth
-    #   restart: unless-stopped
-    #   expose:
-    #       - ${KEYCLOAK_PORT}
-    #   ports:
-    #       - "${KEYCLOAK_PORT}}:${KEYCLOAK_PORT}"
+    auth:
+      image: keycloak:latest
+      container_name: auth
+      restart: unless-stopped
+      command: start
+      expose:
+          - ${KEYCLOAK_PORT}
+      ports:
+          - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+      environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      env_file: .env
+      networks:
+          - textractor_network
 
 volumes:
     user-data:
     image-data:
-    cache-data:
+    # cache-data:
+
+networks:
+    textractor_network:
