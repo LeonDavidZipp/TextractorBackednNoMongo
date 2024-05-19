@@ -21,7 +21,6 @@ type UploadImageResult struct {
 func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
 	img, err := image.Open()
 	if err != nil {
-		fmt.Println("\n\n\nError opening image: ", err)
 		return UploadImageResult{}, err
 	}
 	defer img.Close()
@@ -41,7 +40,6 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 
 	link := uploadResult.Location
-	fmt.Println("\n\n\nLink: ", link)
 
 	text, err := ExtractText(ctx, *input.Key)
 	if err != nil {
