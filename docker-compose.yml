@@ -79,8 +79,17 @@ services:
       ports:
           - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
       environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+          - KC_PROXY_ADDRESS_FORWARDING=${KC_PROXY_ADDRESS_FORWARDING}
+          - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
+          - KC_HOSTNAME=${KC_HOSTNAME}
+          - KC_PROXY=${KC_PROXY}
+          - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
+          - DB=${KC_DB_NAME}
+          - DB_URL=${KC_DB_URL}
+          - DB_USERNAME=${KC_DB_USERNAME}
+          - DB_PASSWORD=${KC_DB_PASSWORD}
+          - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+          - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       env_file: .env
       networks:
           - textractor_network
