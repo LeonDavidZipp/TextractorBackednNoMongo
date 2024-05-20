@@ -46,10 +46,6 @@ migratedown:
 dbcmd:
 	docker-compose exec db psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
 
-startmdb:
-	docker-compose up imagedb
-
-# createmongo
 
 #############################################################################################################################################################################
 #																																											#

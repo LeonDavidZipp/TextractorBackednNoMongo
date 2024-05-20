@@ -23,13 +23,13 @@ func uploadImage(t *testing.T, imagePath string) string {
 	result, err := testImageClient.UploadAndExtractImage(ctx, image)
 	require.NoError(t, err)
 
-	link := result.Link
+	url := result.Url
 	text := result.Text
 
-	require.NotEmpty(t, link)
+	require.NotEmpty(t, url)
 	require.NotEmpty(t, text)
 
-	return link
+	return url
 }
 
 func TestUploadImage(t *testing.T) {
@@ -39,9 +39,9 @@ func TestUploadImage(t *testing.T) {
 func TestGetImage(t *testing.T) {
 	ctx := context.Background()
 
-	link := uploadImage(t, "/app/test_files/sample.jpeg")
+	url := uploadImage(t, "/app/test_files/sample.jpeg")
 
-	imageBytes, err := testImageClient.GetImage(ctx, link)
+	imageBytes, err := testImageClient.GetImageFromS3(ctx, url)
 	require.NoError(t, err)
 	require.NotEmpty(t, imageBytes)
 }
@@ -49,16 +49,16 @@ func TestGetImage(t *testing.T) {
 func TestDeleteImages(t *testing.T) {
 	ctx := context.Background()
 
-	links := make([]string, 10)
+	urls := make([]string, 10)
 	for i := 0; i < 10; i++ {
-		links[i] = uploadImage(t, "/app/test_files/sample.jpeg")
+		urls[i] = uploadImage(t, "/app/test_files/sample.jpeg")
 	}
 
-	err := testImageClient.DeleteImagesFromS3(ctx, links)
+	err := testImageClient.DeleteImagesFromS3(ctx, urls)
 	require.NoError(t, err)
 
-	for _, link := range links {
-		imageBytes, err := testImageClient.GetImage(ctx, link)
+	for _, url := range urls {
+		imageBytes, err := testImageClient.GetImageFromS3(ctx, url)
 		require.Error(t, err)
 		require.Empty(t, imageBytes)
 	}

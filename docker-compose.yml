@@ -12,16 +12,15 @@ services:
             - ${BACKEND_PORT}:${BACKEND_PORT}
         depends_on:
             - db
-            - mongo-db
         volumes: # remove after testing
             - .:/app
         env_file: .env
         networks:
             - textractor_network
 
-    userdb: # db
+    db: # db
         image: "postgres:16.2-alpine3.19"
-        container_name: userdb
+        container_name: db
         restart: unless-stopped
         expose:
             - ${POSTGRES_PORT}
@@ -32,25 +31,6 @@ services:
         environment:
             - POSTGRES_USER=${POSTGRES_USER}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-        env_file: .env
-        networks:
-            - textractor_network
-
-    imagedb: # mongo-db
-        build:
-            context: .
-            dockerfile: Dockerfile.mongodb
-        container_name: imagedb
-        restart: unless-stopped
-        expose:
-            - ${MONGO_PORT}
-        ports:
-            - ${MONGO_PORT}:${MONGO_PORT}
-        volumes:
-            - image-data:/data/db
-        environment:
-            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
         env_file: .env
         networks:
             - textractor_network
@@ -69,50 +49,48 @@ services:
     #     networks:
     #         - textractor_network
 
-    keycloak:
-      image: keycloak:latest
-      container_name: auth
-      restart: unless-stopped
-      command: start
-      expose:
-          - ${KEYCLOAK_PORT}
-      ports:
-          - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
-      environment:
-          - KC_PROXY_ADDRESS_FORWARDING=${KC_PROXY_ADDRESS_FORWARDING}
-          - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
-          - KC_HOSTNAME=${KC_HOSTNAME}
-          - KC_PROXY=${KC_PROXY}
-          - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
-          - DB=${KC_DB_NAME}
-          - DB_URL=${KC_DB_URL}
-          - DB_USERNAME=${KC_DB_USERNAME}
-          - DB_PASSWORD=${KC_DB_PASSWORD}
-          - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
-          - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
-      env_file: .env
-      networks:
-        proxy:
-        textractor_network:
-      labels:
-        - "traefik.enable=${TRAEFIK_ENABLE}"
-        - "traefik.http.routers.keycloak.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_ENTRYPOINTS}"
-        - "traefik.http.routers.keycloak.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_RULE}"
-        - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=${TRAEFIK_HTTP_MIDDLEWARES_KEYCLOAK_HTTPS_REDIRECT_REDIRECTSCHEME_SCHEME}"
-        - "traefik.http.routers.keycloak.middlewares=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_MIDDLEWARES}"
-        - "traefik.http.routers.keycloak-secure.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_ENTRYPOINTS}"
-        - "traefik.http.routers.keycloak-secure.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_RULE}"
-        - "traefik.http.routers.keycloak-secure.tls=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_TLS}"
-        - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
-        - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
-        - "traefik.docker.network=${TRAEFIK_DOCKER_NETWORK}"
+    # keycloak:
+    #   image: keycloak:latest
+    #   container_name: auth
+    #   restart: unless-stopped
+    #   command: start
+    #   expose:
+    #       - ${KEYCLOAK_PORT}
+    #   ports:
+    #       - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+    #   environment:
+    #       - KC_PROXY_ADDRESS_FORWARDING=${KC_PROXY_ADDRESS_FORWARDING}
+    #       - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
+    #       - KC_HOSTNAME=${KC_HOSTNAME}
+    #       - KC_PROXY=${KC_PROXY}
+    #       - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
+    #       - DB=${KC_DB_NAME}
+    #       - DB_URL=${KC_DB_URL}
+    #       - DB_USERNAME=${KC_DB_USERNAME}
+    #       - DB_PASSWORD=${KC_DB_PASSWORD}
+    #       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+    #       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+    #   env_file: .env
+    #   networks:
+    #     proxy:
+    #     textractor_network:
+    #   labels:
+    #     - "traefik.enable=${TRAEFIK_ENABLE}"
+    #     - "traefik.http.routers.keycloak.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_ENTRYPOINTS}"
+    #     - "traefik.http.routers.keycloak.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_RULE}"
+    #     - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=${TRAEFIK_HTTP_MIDDLEWARES_KEYCLOAK_HTTPS_REDIRECT_REDIRECTSCHEME_SCHEME}"
+    #     - "traefik.http.routers.keycloak.middlewares=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_MIDDLEWARES}"
+    #     - "traefik.http.routers.keycloak-secure.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_ENTRYPOINTS}"
+    #     - "traefik.http.routers.keycloak-secure.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_RULE}"
+    #     - "traefik.http.routers.keycloak-secure.tls=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_TLS}"
+    #     - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
+    #     - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
+    #     - "traefik.docker.network=proxy"
+
 networks:
   proxy:
     external: true
-  keycloak:
   textractor_network:
 
 volumes:
     user-data:
-    image-data:
-    # cache-data:

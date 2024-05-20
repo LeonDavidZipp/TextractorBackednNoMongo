@@ -10,8 +10,8 @@ import (
 // just first structure
 // type S3Client interface {
 // 	UploadImage(ctx context.Context, imageData []byte) (string, error)
-// 	GetImage(ctx context.Context, link string) ([]byte, error)
-// 	DeleteImages(ctx context.Context, links []string) error
+// 	GetImage(ctx context.Context, url string) ([]byte, error)
+// 	DeleteImages(ctx context.Context, urls []string) error
 // }
 
 type S3Client interface {

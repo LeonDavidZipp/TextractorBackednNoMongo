@@ -18,20 +18,19 @@ func NewServer(store st.Store) *Server {
 
 	router := gin.Default()
 
-	// Accounts (Postgres)
-	router.POST("/accounts", server.createAccount)
+	// Users (Postgres)
+	router.POST("/users", server.createUser)
 
-	router.GET("/accounts/:id", server.getAccount)
-	router.DELETE("/accounts/:id", server.deleteAccount)
+	router.GET("/users/:id", server.getUser)
+	router.DELETE("/users/:id", server.deleteUser)
 	
 	// Images (Mongo)
-	router.POST("/accounts/images", server.insertImage)
-	router.GET("accounts/images", server.listImages)
-	router.DELETE("/accounts/images", server.deleteImages)
+	router.POST("/users/images", server.insertImage)
+	router.GET("users/images", server.listImages)
+	router.DELETE("/users/images", server.deleteImages)
 
-	router.GET("/accounts/images/:id", server.findImage)
-	router.DELETE("/accounts/images/:id", server.deleteImage)
-	router.PATCH("/accounts/images/:id", server.updateImage)
+	router.GET("/users/images/:id", server.getImage)
+	router.PATCH("/users/images/:id", server.updateImage)
 
 	server.router = router
 

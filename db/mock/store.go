@@ -13,10 +13,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	db "github.com/LeonDavidZipp/Textractor/db/mongo_db"
-	db0 "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	db1 "github.com/LeonDavidZipp/Textractor/db/store"
-	primitive "go.mongodb.org/mongo-driver/bson/primitive"
+	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
+	db0 "github.com/LeonDavidZipp/Textractor/db/store"
+	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -43,51 +42,98 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
-// CreateAccount mocks base method.
-func (m *MockStore) CreateAccount(arg0 context.Context, arg1 db0.CreateAccountParams) (db0.Account, error) {
+// AbortMultipartUpload mocks base method.
+func (m *MockStore) AbortMultipartUpload(arg0 context.Context, arg1 *s3.AbortMultipartUploadInput, arg2 ...func(*s3.Options)) (*s3.AbortMultipartUploadOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAccount", arg0, arg1)
-	ret0, _ := ret[0].(db0.Account)
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AbortMultipartUpload", varargs...)
+	ret0, _ := ret[0].(*s3.AbortMultipartUploadOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateAccount indicates an expected call of CreateAccount.
-func (mr *MockStoreMockRecorder) CreateAccount(arg0, arg1 any) *gomock.Call {
+// AbortMultipartUpload indicates an expected call of AbortMultipartUpload.
+func (mr *MockStoreMockRecorder) AbortMultipartUpload(arg0, arg1 any, arg2 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockStore)(nil).CreateAccount), arg0, arg1)
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AbortMultipartUpload", reflect.TypeOf((*MockStore)(nil).AbortMultipartUpload), varargs...)
 }
 
-// DeleteAccount mocks base method.
-func (m *MockStore) DeleteAccount(arg0 context.Context, arg1 int64) error {
+// CompleteMultipartUpload mocks base method.
+func (m *MockStore) CompleteMultipartUpload(arg0 context.Context, arg1 *s3.CompleteMultipartUploadInput, arg2 ...func(*s3.Options)) (*s3.CompleteMultipartUploadOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteAccount", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CompleteMultipartUpload", varargs...)
+	ret0, _ := ret[0].(*s3.CompleteMultipartUploadOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// DeleteAccount indicates an expected call of DeleteAccount.
-func (mr *MockStoreMockRecorder) DeleteAccount(arg0, arg1 any) *gomock.Call {
+// CompleteMultipartUpload indicates an expected call of CompleteMultipartUpload.
+func (mr *MockStoreMockRecorder) CompleteMultipartUpload(arg0, arg1 any, arg2 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAccount", reflect.TypeOf((*MockStore)(nil).DeleteAccount), arg0, arg1)
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompleteMultipartUpload", reflect.TypeOf((*MockStore)(nil).CompleteMultipartUpload), varargs...)
 }
 
-// DeleteImage mocks base method.
-func (m *MockStore) DeleteImage(arg0 context.Context, arg1 primitive.ObjectID) error {
+// CreateImage mocks base method.
+func (m *MockStore) CreateImage(arg0 context.Context, arg1 db.CreateImageParams) (db.Image, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteImage", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "CreateImage", arg0, arg1)
+	ret0, _ := ret[0].(db.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// DeleteImage indicates an expected call of DeleteImage.
-func (mr *MockStoreMockRecorder) DeleteImage(arg0, arg1 any) *gomock.Call {
+// CreateImage indicates an expected call of CreateImage.
+func (mr *MockStoreMockRecorder) CreateImage(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteImage", reflect.TypeOf((*MockStore)(nil).DeleteImage), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateImage", reflect.TypeOf((*MockStore)(nil).CreateImage), arg0, arg1)
+}
+
+// CreateMultipartUpload mocks base method.
+func (m *MockStore) CreateMultipartUpload(arg0 context.Context, arg1 *s3.CreateMultipartUploadInput, arg2 ...func(*s3.Options)) (*s3.CreateMultipartUploadOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateMultipartUpload", varargs...)
+	ret0, _ := ret[0].(*s3.CreateMultipartUploadOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateMultipartUpload indicates an expected call of CreateMultipartUpload.
+func (mr *MockStoreMockRecorder) CreateMultipartUpload(arg0, arg1 any, arg2 ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMultipartUpload", reflect.TypeOf((*MockStore)(nil).CreateMultipartUpload), varargs...)
+}
+
+// CreateUser mocks base method.
+func (m *MockStore) CreateUser(arg0 context.Context, arg1 string) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockStore)(nil).CreateUser), arg0, arg1)
 }
 
 // DeleteImages mocks base method.
-func (m *MockStore) DeleteImages(arg0 context.Context, arg1 []primitive.ObjectID) error {
+func (m *MockStore) DeleteImages(arg0 context.Context, arg1 []int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteImages", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -100,79 +146,133 @@ func (mr *MockStoreMockRecorder) DeleteImages(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteImages", reflect.TypeOf((*MockStore)(nil).DeleteImages), arg0, arg1)
 }
 
-// FindImage mocks base method.
-func (m *MockStore) FindImage(arg0 context.Context, arg1 primitive.ObjectID) (db.Image, error) {
+// DeleteImagesTransaction mocks base method.
+func (m *MockStore) DeleteImagesTransaction(arg0 context.Context, arg1 db0.DeleteImagesTransactionParams) (db.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindImage", arg0, arg1)
+	ret := m.ctrl.Call(m, "DeleteImagesTransaction", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteImagesTransaction indicates an expected call of DeleteImagesTransaction.
+func (mr *MockStoreMockRecorder) DeleteImagesTransaction(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteImagesTransaction", reflect.TypeOf((*MockStore)(nil).DeleteImagesTransaction), arg0, arg1)
+}
+
+// DeleteObjects mocks base method.
+func (m *MockStore) DeleteObjects(arg0 context.Context, arg1 *s3.DeleteObjectsInput, arg2 ...func(*s3.Options)) (*s3.DeleteObjectsOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteObjects", varargs...)
+	ret0, _ := ret[0].(*s3.DeleteObjectsOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteObjects indicates an expected call of DeleteObjects.
+func (mr *MockStoreMockRecorder) DeleteObjects(arg0, arg1 any, arg2 ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObjects", reflect.TypeOf((*MockStore)(nil).DeleteObjects), varargs...)
+}
+
+// DeleteUser mocks base method.
+func (m *MockStore) DeleteUser(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUser indicates an expected call of DeleteUser.
+func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1)
+}
+
+// GetImageForUpdate mocks base method.
+func (m *MockStore) GetImageForUpdate(arg0 context.Context, arg1 int64) (db.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetImageForUpdate", arg0, arg1)
 	ret0, _ := ret[0].(db.Image)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindImage indicates an expected call of FindImage.
-func (mr *MockStoreMockRecorder) FindImage(arg0, arg1 any) *gomock.Call {
+// GetImageForUpdate indicates an expected call of GetImageForUpdate.
+func (mr *MockStoreMockRecorder) GetImageForUpdate(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindImage", reflect.TypeOf((*MockStore)(nil).FindImage), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetImageForUpdate", reflect.TypeOf((*MockStore)(nil).GetImageForUpdate), arg0, arg1)
 }
 
-// GetAccount mocks base method.
-func (m *MockStore) GetAccount(arg0 context.Context, arg1 int64) (db0.Account, error) {
+// GetImageFromSQL mocks base method.
+func (m *MockStore) GetImageFromSQL(arg0 context.Context, arg1 int64) (db.Image, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccount", arg0, arg1)
-	ret0, _ := ret[0].(db0.Account)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAccount indicates an expected call of GetAccount.
-func (mr *MockStoreMockRecorder) GetAccount(arg0, arg1 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockStore)(nil).GetAccount), arg0, arg1)
-}
-
-// GetAccountForUpdate mocks base method.
-func (m *MockStore) GetAccountForUpdate(arg0 context.Context, arg1 int64) (db0.Account, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccountForUpdate", arg0, arg1)
-	ret0, _ := ret[0].(db0.Account)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAccountForUpdate indicates an expected call of GetAccountForUpdate.
-func (mr *MockStoreMockRecorder) GetAccountForUpdate(arg0, arg1 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountForUpdate", reflect.TypeOf((*MockStore)(nil).GetAccountForUpdate), arg0, arg1)
-}
-
-// InsertImage mocks base method.
-func (m *MockStore) InsertImage(arg0 context.Context, arg1 db.InsertImageParams) (db.Image, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertImage", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetImageFromSQL", arg0, arg1)
 	ret0, _ := ret[0].(db.Image)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// InsertImage indicates an expected call of InsertImage.
-func (mr *MockStoreMockRecorder) InsertImage(arg0, arg1 any) *gomock.Call {
+// GetImageFromSQL indicates an expected call of GetImageFromSQL.
+func (mr *MockStoreMockRecorder) GetImageFromSQL(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertImage", reflect.TypeOf((*MockStore)(nil).InsertImage), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetImageFromSQL", reflect.TypeOf((*MockStore)(nil).GetImageFromSQL), arg0, arg1)
 }
 
-// ListAccounts mocks base method.
-func (m *MockStore) ListAccounts(arg0 context.Context, arg1 db0.ListAccountsParams) ([]db0.Account, error) {
+// GetObject mocks base method.
+func (m *MockStore) GetObject(arg0 context.Context, arg1 *s3.GetObjectInput, arg2 ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListAccounts", arg0, arg1)
-	ret0, _ := ret[0].([]db0.Account)
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetObject", varargs...)
+	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListAccounts indicates an expected call of ListAccounts.
-func (mr *MockStoreMockRecorder) ListAccounts(arg0, arg1 any) *gomock.Call {
+// GetObject indicates an expected call of GetObject.
+func (mr *MockStoreMockRecorder) GetObject(arg0, arg1 any, arg2 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*MockStore)(nil).ListAccounts), arg0, arg1)
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*MockStore)(nil).GetObject), varargs...)
+}
+
+// GetUser mocks base method.
+func (m *MockStore) GetUser(arg0 context.Context, arg1 int64) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUser", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUser indicates an expected call of GetUser.
+func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockStore)(nil).GetUser), arg0, arg1)
+}
+
+// GetUserForUpdate mocks base method.
+func (m *MockStore) GetUserForUpdate(arg0 context.Context, arg1 int64) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserForUpdate", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserForUpdate indicates an expected call of GetUserForUpdate.
+func (mr *MockStoreMockRecorder) GetUserForUpdate(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserForUpdate", reflect.TypeOf((*MockStore)(nil).GetUserForUpdate), arg0, arg1)
 }
 
 // ListImages mocks base method.
@@ -190,41 +290,46 @@ func (mr *MockStoreMockRecorder) ListImages(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListImages", reflect.TypeOf((*MockStore)(nil).ListImages), arg0, arg1)
 }
 
-// UpdateEmail mocks base method.
-func (m *MockStore) UpdateEmail(arg0 context.Context, arg1 db0.UpdateEmailParams) (db0.Account, error) {
+// ListUsers mocks base method.
+func (m *MockStore) ListUsers(arg0 context.Context, arg1 db.ListUsersParams) ([]db.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateEmail", arg0, arg1)
-	ret0, _ := ret[0].(db0.Account)
+	ret := m.ctrl.Call(m, "ListUsers", arg0, arg1)
+	ret0, _ := ret[0].([]db.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateEmail indicates an expected call of UpdateEmail.
-func (mr *MockStoreMockRecorder) UpdateEmail(arg0, arg1 any) *gomock.Call {
+// ListUsers indicates an expected call of ListUsers.
+func (mr *MockStoreMockRecorder) ListUsers(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockStore)(nil).UpdateEmail), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockStore)(nil).ListUsers), arg0, arg1)
 }
 
-// UpdateImage mocks base method.
-func (m *MockStore) UpdateImage(arg0 context.Context, arg1 db.UpdateImageParams) (db.Image, error) {
+// PutObject mocks base method.
+func (m *MockStore) PutObject(arg0 context.Context, arg1 *s3.PutObjectInput, arg2 ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateImage", arg0, arg1)
-	ret0, _ := ret[0].(db.Image)
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PutObject", varargs...)
+	ret0, _ := ret[0].(*s3.PutObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateImage indicates an expected call of UpdateImage.
-func (mr *MockStoreMockRecorder) UpdateImage(arg0, arg1 any) *gomock.Call {
+// PutObject indicates an expected call of PutObject.
+func (mr *MockStoreMockRecorder) PutObject(arg0, arg1 any, arg2 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateImage", reflect.TypeOf((*MockStore)(nil).UpdateImage), arg0, arg1)
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutObject", reflect.TypeOf((*MockStore)(nil).PutObject), varargs...)
 }
 
 // UpdateImageCount mocks base method.
-func (m *MockStore) UpdateImageCount(arg0 context.Context, arg1 db0.UpdateImageCountParams) (db0.Account, error) {
+func (m *MockStore) UpdateImageCount(arg0 context.Context, arg1 db.UpdateImageCountParams) (db.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateImageCount", arg0, arg1)
-	ret0, _ := ret[0].(db0.Account)
+	ret0, _ := ret[0].(db.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -235,11 +340,41 @@ func (mr *MockStoreMockRecorder) UpdateImageCount(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateImageCount", reflect.TypeOf((*MockStore)(nil).UpdateImageCount), arg0, arg1)
 }
 
+// UpdateImageText mocks base method.
+func (m *MockStore) UpdateImageText(arg0 context.Context, arg1 db.UpdateImageTextParams) (db.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateImageText", arg0, arg1)
+	ret0, _ := ret[0].(db.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateImageText indicates an expected call of UpdateImageText.
+func (mr *MockStoreMockRecorder) UpdateImageText(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateImageText", reflect.TypeOf((*MockStore)(nil).UpdateImageText), arg0, arg1)
+}
+
+// UpdateImageUrl mocks base method.
+func (m *MockStore) UpdateImageUrl(arg0 context.Context, arg1 db.UpdateImageUrlParams) (db.Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateImageUrl", arg0, arg1)
+	ret0, _ := ret[0].(db.Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateImageUrl indicates an expected call of UpdateImageUrl.
+func (mr *MockStoreMockRecorder) UpdateImageUrl(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateImageUrl", reflect.TypeOf((*MockStore)(nil).UpdateImageUrl), arg0, arg1)
+}
+
 // UpdateSubscribed mocks base method.
-func (m *MockStore) UpdateSubscribed(arg0 context.Context, arg1 db0.UpdateSubscribedParams) (db0.Account, error) {
+func (m *MockStore) UpdateSubscribed(arg0 context.Context, arg1 db.UpdateSubscribedParams) (db.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSubscribed", arg0, arg1)
-	ret0, _ := ret[0].(db0.Account)
+	ret0, _ := ret[0].(db.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -251,10 +386,10 @@ func (mr *MockStoreMockRecorder) UpdateSubscribed(arg0, arg1 any) *gomock.Call {
 }
 
 // UploadImageTransaction mocks base method.
-func (m *MockStore) UploadImageTransaction(arg0 context.Context, arg1 db1.UploadImageTransactionParams) (db1.UploadImageTransactionResult, error) {
+func (m *MockStore) UploadImageTransaction(arg0 context.Context, arg1 db0.UploadImageTransactionParams) (db0.UploadImageTransactionResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UploadImageTransaction", arg0, arg1)
-	ret0, _ := ret[0].(db1.UploadImageTransactionResult)
+	ret0, _ := ret[0].(db0.UploadImageTransactionResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -263,4 +398,24 @@ func (m *MockStore) UploadImageTransaction(arg0 context.Context, arg1 db1.Upload
 func (mr *MockStoreMockRecorder) UploadImageTransaction(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadImageTransaction", reflect.TypeOf((*MockStore)(nil).UploadImageTransaction), arg0, arg1)
+}
+
+// UploadPart mocks base method.
+func (m *MockStore) UploadPart(arg0 context.Context, arg1 *s3.UploadPartInput, arg2 ...func(*s3.Options)) (*s3.UploadPartOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UploadPart", varargs...)
+	ret0, _ := ret[0].(*s3.UploadPartOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UploadPart indicates an expected call of UploadPart.
+func (mr *MockStoreMockRecorder) UploadPart(arg0, arg1 any, arg2 ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadPart", reflect.TypeOf((*MockStore)(nil).UploadPart), varargs...)
 }
