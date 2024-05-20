@@ -8,21 +8,21 @@ import (
 	"testing"
 )
 
-var testAccountQueries *Queries
-var testAccountDB *sql.DB
+var testUserQueries *Queries
+var testUserDB *sql.DB
 
 func TestMain(m *testing.M) {
 	var err error
-	testAccountDB, err = sql.Open(
+	testUserDB, err = sql.Open(
 		os.Getenv("POSTGRES_DRIVER"),
 		os.Getenv("POSTGRES_SOURCE"),
 	)
 	if err != nil {
 		log.Fatal("Cannot connect to User DB:", err)
 	}
-	defer testAccountDB.Close()
+	defer testUserDB.Close()
 
-	testAccountQueries = New(testAccountDB)
+	testUserQueries = New(testUserDB)
 
 	os.Exit(m.Run())
 }

@@ -9,7 +9,7 @@ import (
 
 
 type InsertImageParams struct {
-	AccountID int64  `bson:"account_id" json:"account_id"`
+	UserID int64  `bson:"user_id" json:"user_id"`
 	Text      string `bson:"text" json:"text"`
 	// link to the image in s3 storage
 	Link      string `bson:"link" json:"link"`
@@ -25,7 +25,7 @@ func (op *MongoOperations) InsertImage(ctx context.Context, arg InsertImageParam
 
 	image := Image{
 		ID:        inserted.InsertedID.(primitive.ObjectID),
-		AccountID: arg.AccountID,
+		UserID: arg.UserID,
 		Text:      arg.Text,
 		Link:      arg.Link,
 	}
@@ -45,13 +45,13 @@ func (op *MongoOperations) FindImage(ctx context.Context, id primitive.ObjectID)
 }
 
 type ListImagesParams struct {
-	AccountID int64 `bson:"account_id" json:"account_id"`
+	UserID int64 `bson:"user_id" json:"user_id"`
 	Limit     int64 `bson:"amount" json:"amount"`
 	Offset    int64 `bson:"offset" json:"offset"`
 }
 
 func (op *MongoOperations) ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error) {
-	filter := bson.M{"account_id": arg.AccountID}
+	filter := bson.M{"user_id": arg.UserID}
 
 	findOptions := options.Find()
 	findOptions.SetLimit(arg.Limit)

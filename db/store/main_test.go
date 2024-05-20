@@ -15,8 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-var testAccountQueries *db.Queries
-var testAccountDB *sql.DB
+var testUserQueries *db.Queries
+var testUserDB *sql.DB
 
 var testImageOperations *mongodb.MongoOperations
 var testImageDB *mongo.Database
@@ -27,16 +27,16 @@ func TestMain(m *testing.M) {
 	ctx := context.Background()
 
 	var err error
-	testAccountDB, err = sql.Open(
+	testUserDB, err = sql.Open(
 		os.Getenv("POSTGRES_DRIVER"),
 		os.Getenv("POSTGRES_SOURCE"),
 	)
 	if err != nil {
 		log.Fatal("Cannot connect to User DB:", err)
 	}
-	defer testAccountDB.Close()
+	defer testUserDB.Close()
 
-	testAccountQueries = db.New(testAccountDB)
+	testUserQueries = db.New(testUserDB)
 
 	optionsClient := options.Client().ApplyURI(os.Getenv("MONGO_SOURCE"))
 	mongoClient, err := mongo.Connect(ctx, optionsClient)

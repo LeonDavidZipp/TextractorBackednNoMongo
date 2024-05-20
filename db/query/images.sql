@@ -1,5 +1,8 @@
 -- name: CreateImage :one
-INSERT INTO images (name) VALUES ($1);
+INSERT INTO images 
+(user_id, url, text)
+VALUES ($1, $2, $3)
+RETURNING *;
 
 -- name: GetImage :one
 SELECT * FROM images
@@ -14,13 +17,13 @@ LIMIT 1;
 
 -- name: ListImages :many
 SELECT * FROM images
-WHERE id = $1;
+WHERE id = $1
 LIMIT $2
 OFFSET $3;
 
 -- name: DeleteImages :exec
 DELETE FROM images
-WHERE id = ANY($1)
+WHERE id = ANY($1);
 
 -- name: UpdateImageText :one
 UPDATE images

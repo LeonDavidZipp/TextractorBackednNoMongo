@@ -12,9 +12,9 @@ import (
 var exampleImage1 string
 var exampleImage2 string
 
-func insertImage(t *testing.T, accountID int64) Image {
+func insertImage(t *testing.T, userID int64) Image {
 	arg := InsertImageParams{
-		AccountID: accountID,
+		UserID: userID,
 		Text: util.RandomString(100),
 		Link: util.RandomLink(),
 	}
@@ -25,7 +25,7 @@ func insertImage(t *testing.T, accountID int64) Image {
 	require.NoError(t, err)
 	require.NotEmpty(t, image)
 
-	require.Equal(t, arg.AccountID, image.AccountID)
+	require.Equal(t, arg.UserID, image.UserID)
 	require.Equal(t, arg.Text, image.Text)
 	require.Equal(t, arg.Link, image.Link)
 
@@ -45,7 +45,7 @@ func TestFindImage(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, image2)
 
-	require.Equal(t, image1.AccountID, image2.AccountID)
+	require.Equal(t, image1.UserID, image2.UserID)
 	require.Equal(t, image1.Text, image2.Text)
 	require.Equal(t, image1.Link, image2.Link)
 }
@@ -56,7 +56,7 @@ func TestListImages(t *testing.T) {
 	}
 
 	arg := ListImagesParams{
-		AccountID: 1,
+		UserID: 1,
 		Limit: 5,
 		Offset: 5,
 	}
@@ -88,7 +88,7 @@ func TestUpdateImage(t *testing.T) {
 	require.Equal(t, image1.ID, image2.ID)
 	require.Equal(t, arg.Text, image2.Text)
 
-	require.Equal(t, image1.AccountID, image2.AccountID)
+	require.Equal(t, image1.UserID, image2.UserID)
 	require.Equal(t, image1.Link, image2.Link)
 }
 

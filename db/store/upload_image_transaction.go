@@ -10,18 +10,18 @@ import (
 
 
 type UploadImageTransactionParams struct {
-	AccountID int64                 `json:"account_id"`
+	UserID int64                 `json:"user_id"`
 	Image     *multipart.FileHeader `json:"image"`
 }
 
 type UploadImageTransactionResult struct {
-	Uploader db.Account    `json:"uploader"`
+	Uploader db.User    `json:"uploader"`
 	Image    mongodb.Image `json:"image"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
 func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
-	var uploader db.Account
+	var uploader db.User
 	var image mongodb.Image
 	var link string
 	var text string
@@ -45,14 +45,14 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			var err error
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
 				Amount: 1,
-				ID: arg.AccountID,
+				ID: arg.UserID,
 			})
 			return err
 		},
 		func(op *mongodb.MongoOperations) error {
 			var err error
 			image, err = op.InsertImage(ctx, mongodb.InsertImageParams{
-				AccountID: arg.AccountID,
+				UserID: arg.UserID,
 				Text: text,
 				Link: link,
 			})

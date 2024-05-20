@@ -12,7 +12,7 @@ import (
 )
 
 // type insertImageRequest struct {
-// 	AccountID int64  `json:"account_id" binding:"required"`
+// 	UserID int64  `json:"user_id" binding:"required"`
 // 	// Filepath  string `json:"filepath" binding:"required"`
 // 	ImageData []byte `json:"image_data" binding:"required"`
 // }
@@ -26,7 +26,7 @@ import (
 // 	}
 
 // 	arg := st.UploadImageTransactionParams{
-// 		AccountID: req.AccountID,
+// 		UserID: req.UserID,
 // 		ImageData: req.ImageData,
 // 	}
 
@@ -40,7 +40,7 @@ import (
 // }
 
 type insertImageRequest struct {
-	AccountID int64                 `form:"account_id" binding:"required"`
+	UserID int64                 `form:"user_id" binding:"required"`
 	Image     *multipart.FileHeader `form:"image" binding:"required"`
 }
 
@@ -53,7 +53,7 @@ func (s *Server) insertImage(ctx *gin.Context) {
 	}
 
 	arg := st.UploadImageTransactionParams{
-		AccountID: req.AccountID,
+		UserID: req.UserID,
 		Image: req.Image,
 	}
 
@@ -133,7 +133,7 @@ func (s *Server) updateImage(ctx *gin.Context) {
 
 // List Images
 type listImagesRequest struct {
-	AccountID int64 `json:"account_id" binding:"required"`
+	UserID int64 `json:"user_id" binding:"required"`
 	Limit     int64 `json:"limit" binding:"required"`
 	Offset    int64 `json:"offset" binding:"required"`
 }
@@ -147,7 +147,7 @@ func (s *Server) listImages(ctx *gin.Context) {
 	}
 
 	arg := mongodb.ListImagesParams{
-		AccountID: req.AccountID,
+		UserID: req.UserID,
 		Limit: req.Limit,
 		Offset: req.Offset,
 	}

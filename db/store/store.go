@@ -16,7 +16,7 @@ type Store interface {
 	mongodb.MongoOperator
 	bucket.S3Client
 	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error)
-	DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error)
+	DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.User, error)
 }
 
 type DBStore struct {

@@ -10,8 +10,8 @@ import (
 )
 
 
-func createRandomAccount(t *testing.T) Account {
-	arg := CreateAccountParams{
+func createRandomUser(t *testing.T) User {
+	arg := CreateUserParams{
 		Owner : util.RandomName(),
 		Email : util.RandomEmail(),
 		GoogleID : sql.NullString{},
@@ -19,144 +19,144 @@ func createRandomAccount(t *testing.T) Account {
 	}
 
 	ctx := context.Background()
-	account, err := testAccountQueries.CreateAccount(ctx, arg)
+	user, err := testUserQueries.CreateUser(ctx, arg)
 	require.NoError(t, err)
-	require.NotEmpty(t, account)
+	require.NotEmpty(t, user)
 
-	require.Equal(t, arg.Owner, account.Owner)
-	require.Equal(t, arg.Email, account.Email)
-	require.Equal(t, arg.GoogleID, account.GoogleID)
-	require.Equal(t, arg.FacebookID, account.FacebookID)
+	require.Equal(t, arg.Owner, user.Owner)
+	require.Equal(t, arg.Email, user.Email)
+	require.Equal(t, arg.GoogleID, user.GoogleID)
+	require.Equal(t, arg.FacebookID, user.FacebookID)
 
-	require.NotZero(t, account.ID)
-	require.NotZero(t, account.CreatedAt)
+	require.NotZero(t, user.ID)
+	require.NotZero(t, user.CreatedAt)
 
-	return account
+	return user
 }
 
-func TestCreateAccount(t *testing.T) {
-	createRandomAccount(t)
+func TestCreateUser(t *testing.T) {
+	createRandomUser(t)
 }
 
-func TestGetAccount(t *testing.T) {
-	account1 := createRandomAccount(t)
+func TestGetUser(t *testing.T) {
+	user1 := createRandomUser(t)
 
 	ctx := context.Background()
-	account2, err := testAccountQueries.GetAccount(ctx, account1.ID)
+	user2, err := testUserQueries.GetUser(ctx, user1.ID)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, account2)
+	require.NotEmpty(t, user2)
 
-	require.Equal(t, account1.ID, account2.ID)
-	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, account1.Email, account2.Email)
-	require.Equal(t, account1.GoogleID, account2.GoogleID)
-	require.Equal(t, account1.FacebookID, account2.FacebookID)
-	require.Equal(t, account1.ImageCount, account2.ImageCount)
-	require.Equal(t, account1.Subscribed, account2.Subscribed)
+	require.Equal(t, user1.ID, user2.ID)
+	require.Equal(t, user1.Owner, user2.Owner)
+	require.Equal(t, user1.Email, user2.Email)
+	require.Equal(t, user1.GoogleID, user2.GoogleID)
+	require.Equal(t, user1.FacebookID, user2.FacebookID)
+	require.Equal(t, user1.ImageCount, user2.ImageCount)
+	require.Equal(t, user1.Subscribed, user2.Subscribed)
 
-	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, 10 * time.Second)
+	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, 10 * time.Second)
 }
 
 func TestUpdateEmail(t *testing.T) {
-	account1 := createRandomAccount(t)
+	user1 := createRandomUser(t)
 
 	arg := UpdateEmailParams{
-		ID : account1.ID,
+		ID : user1.ID,
 		Email : "leon@example.com",
 	}
 
 	ctx := context.Background()
-	account2, err := testAccountQueries.UpdateEmail(ctx, arg)
+	user2, err := testUserQueries.UpdateEmail(ctx, arg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, account2)
+	require.NotEmpty(t, user2)
 
-	require.Equal(t, account1.ID, account2.ID)
-	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, account1.GoogleID, account2.GoogleID)
-	require.Equal(t, account1.FacebookID, account2.FacebookID)
-	require.Equal(t, account1.ImageCount, account2.ImageCount)
-	require.Equal(t, account1.Subscribed, account2.Subscribed)
-	require.Equal(t, arg.Email, account2.Email)
+	require.Equal(t, user1.ID, user2.ID)
+	require.Equal(t, user1.Owner, user2.Owner)
+	require.Equal(t, user1.GoogleID, user2.GoogleID)
+	require.Equal(t, user1.FacebookID, user2.FacebookID)
+	require.Equal(t, user1.ImageCount, user2.ImageCount)
+	require.Equal(t, user1.Subscribed, user2.Subscribed)
+	require.Equal(t, arg.Email, user2.Email)
 }
 
 func TestUpdateSubscribed(t *testing.T) {
-	account1 := createRandomAccount(t)
+	user1 := createRandomUser(t)
 
 	arg := UpdateSubscribedParams{
-		ID : account1.ID,
+		ID : user1.ID,
 		Subscribed : true,
 	}
 
 	ctx := context.Background()
-	account2, err := testAccountQueries.UpdateSubscribed(ctx, arg)
+	user2, err := testUserQueries.UpdateSubscribed(ctx, arg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, account2)
+	require.NotEmpty(t, user2)
 
-	require.Equal(t, account1.ID, account2.ID)
-	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, account1.Email, account2.Email)
-	require.Equal(t, account1.GoogleID, account2.GoogleID)
-	require.Equal(t, account1.FacebookID, account2.FacebookID)
-	require.Equal(t, account1.ImageCount, account2.ImageCount)
-	require.Equal(t, arg.Subscribed, account2.Subscribed)
+	require.Equal(t, user1.ID, user2.ID)
+	require.Equal(t, user1.Owner, user2.Owner)
+	require.Equal(t, user1.Email, user2.Email)
+	require.Equal(t, user1.GoogleID, user2.GoogleID)
+	require.Equal(t, user1.FacebookID, user2.FacebookID)
+	require.Equal(t, user1.ImageCount, user2.ImageCount)
+	require.Equal(t, arg.Subscribed, user2.Subscribed)
 }
 
 func TestUpdateImageCount(t *testing.T) {
-	account1 := createRandomAccount(t)
+	user1 := createRandomUser(t)
 	arg := UpdateImageCountParams{
-		ID : account1.ID,
+		ID : user1.ID,
 		Amount : 10,
 	}
 
 	ctx := context.Background()
-	account2, err := testAccountQueries.UpdateImageCount(ctx, arg)
+	user2, err := testUserQueries.UpdateImageCount(ctx, arg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, account2)
+	require.NotEmpty(t, user2)
 
-	require.Equal(t, account1.ID, account2.ID)
-	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, account1.Email, account2.Email)
-	require.Equal(t, account1.GoogleID, account2.GoogleID)
-	require.Equal(t, account1.FacebookID, account2.FacebookID)
-	require.Equal(t, account1.ImageCount + arg.Amount, account2.ImageCount)
-	require.Equal(t, account1.Subscribed, account2.Subscribed)
+	require.Equal(t, user1.ID, user2.ID)
+	require.Equal(t, user1.Owner, user2.Owner)
+	require.Equal(t, user1.Email, user2.Email)
+	require.Equal(t, user1.GoogleID, user2.GoogleID)
+	require.Equal(t, user1.FacebookID, user2.FacebookID)
+	require.Equal(t, user1.ImageCount + arg.Amount, user2.ImageCount)
+	require.Equal(t, user1.Subscribed, user2.Subscribed)
 }
 
-func TestDeleteAccount(t *testing.T) {
-	account1 := createRandomAccount(t)
+func TestDeleteUser(t *testing.T) {
+	user1 := createRandomUser(t)
 
 	ctx := context.Background()
-	err := testAccountQueries.DeleteAccount(ctx, account1.ID)
+	err := testUserQueries.DeleteUser(ctx, user1.ID)
 	require.NoError(t, err)
 
-	account2, err := testAccountQueries.GetAccount(ctx, account1.ID)
+	user2, err := testUserQueries.GetUser(ctx, user1.ID)
 
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
-	require.Empty(t, account2)
+	require.Empty(t, user2)
 }
 
-func TestListAccounts(t *testing.T) {
+func TestListUsers(t *testing.T) {
 	for i :=0; i < 10; i++ {
-		createRandomAccount(t)
+		createRandomUser(t)
 	}
 
-	arg := ListAccountsParams{
+	arg := ListUsersParams{
 		Limit : 5,
 		Offset : 5,
 	}
 
 	ctx := context.Background()
-	accounts, err := testAccountQueries.ListAccounts(ctx, arg)
+	users, err := testUserQueries.ListUsers(ctx, arg)
 
 	require.NoError(t, err)
-	require.Len(t, accounts, 5)
+	require.Len(t, users, 5)
 
-	for _, account := range accounts {
-		require.NotEmpty(t, account)
+	for _, user := range users {
+		require.NotEmpty(t, user)
 	}
 }

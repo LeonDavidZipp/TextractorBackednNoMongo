@@ -10,7 +10,7 @@ import (
 
 
 type DeleteImagesTransactionParams struct {
-	AccountID int64                `json:"account_id"`
+	UserID int64                `json:"user_id"`
 	ImageIDs  []primitive.ObjectID `json:"image_ids"`
 	Links     []string             `json:"links"`
 	Amount    int64                `json:"amount"`
@@ -18,8 +18,8 @@ type DeleteImagesTransactionParams struct {
 
 
 // Delete Images handles deletion of multiple images from the databases.
-func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.Account, error) {
-	var uploader db.Account
+func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.User, error) {
+	var uploader db.User
 
 	err := store.execTransaction(
 		ctx,
@@ -33,7 +33,7 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 			var err error
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
 				Amount: arg.Amount * -1,
-				ID: arg.AccountID,
+				ID: arg.UserID,
 				},
 			)
 			return err
@@ -43,7 +43,7 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 		},
 	)
 	if err != nil {
-		return db.Account{}, err
+		return db.User{}, err
 	}
 
 	return uploader, nil

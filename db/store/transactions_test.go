@@ -12,8 +12,8 @@ import (
 )
 
 
-func createRandomAccount(t *testing.T) db.Account {
-	arg := db.CreateAccountParams{
+func createRandomUser(t *testing.T) db.User {
+	arg := db.CreateUserParams{
 		Owner : util.RandomName(),
 		Email : util.RandomEmail(),
 		GoogleID : sql.NullString{},
@@ -21,29 +21,29 @@ func createRandomAccount(t *testing.T) db.Account {
 	}
 
 	ctx := context.Background()
-	account, err := testAccountQueries.CreateAccount(ctx, arg)
+	user, err := testUserQueries.CreateUser(ctx, arg)
 	require.NoError(t, err)
-	require.NotEmpty(t, account)
+	require.NotEmpty(t, user)
 
-	require.Equal(t, arg.Owner, account.Owner)
-	require.Equal(t, arg.Email, account.Email)
-	require.Equal(t, arg.GoogleID, account.GoogleID)
-	require.Equal(t, arg.FacebookID, account.FacebookID)
+	require.Equal(t, arg.Owner, user.Owner)
+	require.Equal(t, arg.Email, user.Email)
+	require.Equal(t, arg.GoogleID, user.GoogleID)
+	require.Equal(t, arg.FacebookID, user.FacebookID)
 
-	require.NotZero(t, account.ID)
-	require.NotZero(t, account.CreatedAt)
+	require.NotZero(t, user.ID)
+	require.NotZero(t, user.CreatedAt)
 
-	return account
+	return user
 }
 
 func TestUploadImageTransaction(t *testing.T) {
 	store := NewStore(
-		testAccountDB,
+		testUserDB,
 		testImageDB,
 		testImageClient,
 	)
 
-	account := createRandomAccount(t)
+	user := createRandomUser(t)
 
 	image, err := util.ImageAsFileHeader("/app/test_files/sample.jpeg")
 	require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestUploadImageTransaction(t *testing.T) {
 			result, err := store.UploadImageTransaction(
 				ctx,
 				UploadImageTransactionParams{
-					AccountID: account.ID,
+					UserID: user.ID,
 					Image: image,
 				},
 			)
@@ -79,36 +79,36 @@ func TestUploadImageTransaction(t *testing.T) {
 		uploader := result.Uploader
 		image := result.Image
 
-		// check uploader account and account are the same
+		// check uploader user and user are the same
 		require.NotEmpty(t, uploader)
 		require.NotEmpty(t, image)
 
-		require.Equal(t, account.ID, uploader.ID)
-		require.Equal(t, uploader.ID, image.AccountID)
+		require.Equal(t, user.ID, uploader.ID)
+		require.Equal(t, uploader.ID, image.UserID)
 		require.NotZero(t, image.ID)
 		
-		_, err = store.GetAccount(ctx, account.ID)
+		_, err = store.GetUser(ctx, user.ID)
 		require.NoError(t, err)
 		_, err = store.FindImage(ctx, image.ID)
 		require.NoError(t, err)
 	}
 
-	updatedAccount, err := store.GetAccount(context.Background(), account.ID)
+	updatedUser, err := store.GetUser(context.Background(), user.ID)
 	require.NoError(t, err)
-	require.Equal(t, account.ImageCount + int64(amount), updatedAccount.ImageCount)
+	require.Equal(t, user.ImageCount + int64(amount), updatedUser.ImageCount)
 }
 
 func TestDeleteImagesTransaction(t *testing.T) {
 	store := NewStore(
-		testAccountDB,
+		testUserDB,
 		testImageDB,
 		testImageClient,
 	)
 	ctx := context.Background()
 	
-	account, err := store.CreateAccount(
+	user, err := store.CreateUser(
 		ctx,
-		db.CreateAccountParams{
+		db.CreateUserParams{
 			Owner: util.RandomName(),
 			Email: util.RandomEmail(),
 		},
@@ -121,7 +121,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 		image, err := store.InsertImage(
 			ctx,
 			mongodb.InsertImageParams{
-				AccountID: account.ID,
+				UserID: user.ID,
 				Text: "some text",
 				Link: "some link",
 			},
@@ -131,16 +131,16 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	}
 
 	toDelete := imageIDs[:amount/2]
-	updatedAccount, err := store.DeleteImagesTransaction(
+	updatedUser, err := store.DeleteImagesTransaction(
 		ctx,
 		DeleteImagesTransactionParams{
-			AccountID: account.ID,
+			UserID: user.ID,
 			ImageIDs: toDelete,
 			Amount: int64(len(toDelete)),
 		},
 	)
 	require.NoError(t, err)
-	require.Equal(t, account.ImageCount - int64(len(toDelete)), updatedAccount.ImageCount)
+	require.Equal(t, user.ImageCount - int64(len(toDelete)), updatedUser.ImageCount)
 
 	for _, id := range toDelete {
 		image, err := store.FindImage(ctx, id)

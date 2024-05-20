@@ -1,14 +1,14 @@
--- name: CreateAccount :one
+-- name: CreateUser :one
 INSERT INTO users (name) VALUES ($1)
 RETURNING *;
 
--- name: GetAccount :one
+-- name: GetUser :one
 SELECT * FROM users
 WHERE id = $1
 LIMIT 1
 FOR NO KEY UPDATE;
 
--- name: GetAccountForUpdate :one
+-- name: GetUserForUpdate :one
 SELECT * FROM users
 WHERE id = $1
 LIMIT 1;
@@ -19,7 +19,7 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
--- name: DeleteAccount :exec
+-- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1;
 
