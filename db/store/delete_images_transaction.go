@@ -4,7 +4,6 @@ import (
 	"context"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
@@ -30,6 +29,11 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 		},
 		func(q *db.Queries) error {
 			var err error
+			_, err = q.DeleteImages(ctx, arg.ImageIDs)
+			if err != nil {
+				return err
+			}
+
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
 				Amount: arg.Amount * -1,
 				ID: arg.UserID,
