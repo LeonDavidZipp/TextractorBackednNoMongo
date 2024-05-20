@@ -33,7 +33,8 @@ func createRandomImage(t *testing.T, userID int64) Image {
 }
 
 func TestCreateImage(t *testing.T) {
-	createRandomImage(t, 1)
+	user := createRandomUser(t)
+	createRandomImage(t, user.ID)
 }
 
 func TestGetImage(t *testing.T) {
