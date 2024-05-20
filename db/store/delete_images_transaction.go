@@ -28,8 +28,7 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 			return nil
 		},
 		func(q *db.Queries) error {
-			var err error
-			_, err = q.DeleteImages(ctx, arg.ImageIDs)
+			_, err := q.DeleteImages(ctx, arg.ImageIDs)
 			if err != nil {
 				return err
 			}
@@ -40,9 +39,6 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 				},
 			)
 			return err
-		},
-		func(op *mongodb.MongoOperations) error {
-			return op.DeleteImagesFromMongo(ctx, arg.ImageIDs)
 		},
 	)
 	if err != nil {
