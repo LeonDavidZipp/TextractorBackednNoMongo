@@ -116,8 +116,10 @@ func (s *Server) listImages(ctx *gin.Context) {
 
 // Delete Images
 type deleteImagesRequest struct {
+	UserID   int64    `json:"user_id" binding:"required"`
 	ImageIDs []int64  `json:"image_ids" binding:"required"`
 	Urls	 []string `json:"urls" binding:"required"`
+	Amount   int64    `json:"amount" binding:"required"`
 }
 
 func (s *Server) deleteImages(ctx *gin.Context) {
@@ -128,7 +130,14 @@ func (s *Server) deleteImages(ctx *gin.Context) {
 		return
 	}
 
-	err := s.store.DeleteImageTransaction(ctx, req.ImageIDs)
+	arg := st.DeleteImagesTransactionParams{
+		UserID: req.UserID,
+		ImageIDs: req.ImageIDs,
+		Urls: req.Urls,
+		Amount: req.Amount,
+	}
+
+	err := s.store.DeleteImageTransaction(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

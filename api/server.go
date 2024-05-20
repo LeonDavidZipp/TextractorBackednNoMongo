@@ -29,7 +29,7 @@ func NewServer(store st.Store) *Server {
 	router.GET("users/images", server.listImages)
 	router.DELETE("/users/images", server.deleteImages)
 
-	router.GET("/users/images/:id", server.findImage)
+	router.GET("/users/images/:id", server.getImage)
 	router.PATCH("/users/images/:id", server.updateImage)
 
 	server.router = router

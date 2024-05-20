@@ -14,7 +14,6 @@ type DeleteImagesTransactionParams struct {
 	Amount   int64    `json:"amount"`
 }
 
-
 // Delete Images handles deletion of multiple images from the databases.
 func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.User, error) {
 	var uploader db.User

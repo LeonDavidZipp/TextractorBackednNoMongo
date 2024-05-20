@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
@@ -10,10 +9,7 @@ import (
 // Postgres
 // Create User
 type createUserRequest struct {
-	Owner      string         `json:"owner" binding:"required"`
-	Email      string         `json:"email" binding:"required"`
-	GoogleID   *string        `json:"google_id"`
-	FacebookID *string        `json:"facebook_id"`
+	Name string `json:"name" binding:"required"`
 }
 
 func (s *Server) createUser(ctx *gin.Context) {
@@ -24,29 +20,7 @@ func (s *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	var googleID, facebookID sql.NullString
-
-	if req.GoogleID != nil {
-		googleID = sql.NullString{
-			String: *req.GoogleID,
-			Valid:  true,
-		}
-	}
-	if req.FacebookID != nil {
-		facebookID = sql.NullString{
-			String: *req.FacebookID,
-			Valid:  true,
-		}
-	}
-
-	arg := db.CreateUserParams{
-		Owner:      req.Owner,
-		Email:      req.Email,
-		GoogleID:   googleID,
-		FacebookID: facebookID,
-	}
-
-	user, err := s.store.CreateUser(ctx, arg)
+	user, err := s.store.CreateUser(ctx, req.Name)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
