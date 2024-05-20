@@ -4,7 +4,7 @@ INSERT INTO images
 VALUES ($1, $2, $3)
 RETURNING *;
 
--- name: GetImage :one
+-- name: GetImageFromSQL :one
 SELECT * FROM images
 WHERE id = $1
 LIMIT 1
@@ -31,7 +31,7 @@ SET text = sqlc.arg(text)
 WHERE id = sqlc.arg(id)
 RETURNING *;
 
--- name: UpdateImageURL :one
+-- name: UpdateImageUrl :one
 UPDATE images
 SET url = sqlc.arg(url)
 WHERE id = sqlc.arg(id)

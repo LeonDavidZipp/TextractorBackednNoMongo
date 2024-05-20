@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"database/sql"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongo
 	"github.com/LeonDavidZipp/Textractor/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -110,7 +109,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 			mongodb.InsertImageParams{
 				UserID: user.ID,
 				Text: "some text",
-				URL: "some url",
+				Url: "some url",
 			},
 		)
 		require.NoError(t, err)

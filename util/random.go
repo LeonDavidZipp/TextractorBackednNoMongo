@@ -27,7 +27,7 @@ func RandomEmail() string {
 	return RandomString(10) + "@example.com"
 }
 
-func RandomURL() string {
+func RandomUrl() string {
 	return RandomString(10) + ".com"
 }
 

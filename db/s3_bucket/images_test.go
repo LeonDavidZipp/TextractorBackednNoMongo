@@ -23,7 +23,7 @@ func uploadImage(t *testing.T, imagePath string) string {
 	result, err := testImageClient.UploadAndExtractImage(ctx, image)
 	require.NoError(t, err)
 
-	url := result.URL
+	url := result.Url
 	text := result.Text
 
 	require.NotEmpty(t, url)

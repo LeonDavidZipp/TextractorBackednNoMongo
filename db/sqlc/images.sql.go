@@ -47,15 +47,14 @@ func (q *Queries) DeleteImages(ctx context.Context, ids []int64) error {
 	return err
 }
 
-const getImage = `-- name: GetImage :one
+const getImageForUpdate = `-- name: GetImageForUpdate :one
 SELECT id, user_id, url, text, created_at FROM images
 WHERE id = $1
 LIMIT 1
-FOR NO KEY UPDATE
 `
 
-func (q *Queries) GetImage(ctx context.Context, id int64) (Image, error) {
-	row := q.db.QueryRowContext(ctx, getImage, id)
+func (q *Queries) GetImageForUpdate(ctx context.Context, id int64) (Image, error) {
+	row := q.db.QueryRowContext(ctx, getImageForUpdate, id)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -67,14 +66,15 @@ func (q *Queries) GetImage(ctx context.Context, id int64) (Image, error) {
 	return i, err
 }
 
-const getImageForUpdate = `-- name: GetImageForUpdate :one
+const getImageFromSQL = `-- name: GetImageFromSQL :one
 SELECT id, user_id, url, text, created_at FROM images
 WHERE id = $1
 LIMIT 1
+FOR NO KEY UPDATE
 `
 
-func (q *Queries) GetImageForUpdate(ctx context.Context, id int64) (Image, error) {
-	row := q.db.QueryRowContext(ctx, getImageForUpdate, id)
+func (q *Queries) GetImageFromSQL(ctx context.Context, id int64) (Image, error) {
+	row := q.db.QueryRowContext(ctx, getImageFromSQL, id)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -153,20 +153,20 @@ func (q *Queries) UpdateImageText(ctx context.Context, arg UpdateImageTextParams
 	return i, err
 }
 
-const updateImageURL = `-- name: UpdateImageURL :one
+const updateImageUrl = `-- name: UpdateImageUrl :one
 UPDATE images
 SET url = $1
 WHERE id = $2
 RETURNING id, user_id, url, text, created_at
 `
 
-type UpdateImageURLParams struct {
+type UpdateImageUrlParams struct {
 	Url string `json:"url"`
 	ID  int64  `json:"id"`
 }
 
-func (q *Queries) UpdateImageURL(ctx context.Context, arg UpdateImageURLParams) (Image, error) {
-	row := q.db.QueryRowContext(ctx, updateImageURL, arg.Url, arg.ID)
+func (q *Queries) UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) (Image, error) {
+	row := q.db.QueryRowContext(ctx, updateImageUrl, arg.Url, arg.ID)
 	var i Image
 	err := row.Scan(
 		&i.ID,

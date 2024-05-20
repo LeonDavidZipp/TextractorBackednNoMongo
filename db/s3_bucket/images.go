@@ -14,7 +14,7 @@ import (
 )
 
 type UploadImageResult struct {
-	URL string `json:"url"`
+	Url string `json:"url"`
 	Text string `json:"text"`
 }
 
@@ -47,15 +47,15 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 	
 	result := UploadImageResult{
-		URL: url,
+		Url: url,
 		Text: text,
 	}
 
 	return result, nil
 }
 
-func (c *Client) GetImage(ctx context.Context, url string) ([]byte, error) {
-	key, err := KeyFromURL(ctx, url)
+func (c *Client) GetImageFromS3(ctx context.Context, url string) ([]byte, error) {
+	key, err := KeyFromUrl(ctx, url)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *Client) GetImage(ctx context.Context, url string) ([]byte, error) {
 func (c *Client) DeleteImagesFromS3(ctx context.Context, urls []string) error {
 	var objectIds []types.ObjectIdentifier
 	for _, url := range urls {
-		key, err := KeyFromURL(ctx, url)
+		key, err := KeyFromUrl(ctx, url)
 		if err != nil {
 			return err
 		}

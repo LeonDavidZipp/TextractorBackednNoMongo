@@ -15,7 +15,7 @@ type UploadImageTransactionParams struct {
 
 type UploadImageTransactionResult struct {
 	Uploader db.User    `json:"uploader"`
-	Image    mongodb.Image `json:"image"`
+	Image    db.Image   `json:"image"`
 }
 
 // Upload Image handles uploading the necessary data and image to the databases.
@@ -33,7 +33,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 				return err
 			}
 
-			url = result.URL
+			url = result.Url
 			text = result.Text
 			return nil
 		},
@@ -44,7 +44,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			var err error
 			image, err = q.CreateImage(ctx, db.CreateImageParams{
 				UserID: arg.UserID,
-				URL: url,
+				Url: url,
 				Text: text,
 			})
 			if err != nil {

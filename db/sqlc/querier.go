@@ -13,15 +13,15 @@ type Querier interface {
 	CreateUser(ctx context.Context, name string) (User, error)
 	DeleteImages(ctx context.Context, ids []int64) error
 	DeleteUser(ctx context.Context, id int64) error
-	GetImage(ctx context.Context, id int64) (Image, error)
 	GetImageForUpdate(ctx context.Context, id int64) (Image, error)
+	GetImageFromSQL(ctx context.Context, id int64) (Image, error)
 	GetUser(ctx context.Context, id int64) (User, error)
 	GetUserForUpdate(ctx context.Context, id int64) (User, error)
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	UpdateImageCount(ctx context.Context, arg UpdateImageCountParams) (User, error)
 	UpdateImageText(ctx context.Context, arg UpdateImageTextParams) (Image, error)
-	UpdateImageURL(ctx context.Context, arg UpdateImageURLParams) (Image, error)
+	UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) (Image, error)
 	UpdateSubscribed(ctx context.Context, arg UpdateSubscribedParams) (User, error)
 }
 

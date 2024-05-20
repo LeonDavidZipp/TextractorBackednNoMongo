@@ -24,7 +24,7 @@ type DBStore struct {
 
 func NewStore(DB *sql.DB, s3Client *s3.Client) Store {
 	return &DBStore{
-		Queries: db.New(userDB),
+		Queries: db.New(DB),
 		Client: bucket.NewS3(s3Client),
 		DB: DB,
 	}
