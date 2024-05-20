@@ -1,47 +1,36 @@
 -- name: CreateAccount :one
-INSERT INTO accounts (
-    owner,
-    email,
-    google_id,
-    facebook_id
-) VALUES ($1, $2, $3, $4)
+INSERT INTO users (name) VALUES ($1)
 RETURNING *;
 
 -- name: GetAccount :one
-SELECT * FROM accounts
+SELECT * FROM users
 WHERE id = $1
 LIMIT 1
 FOR NO KEY UPDATE;
 
 -- name: GetAccountForUpdate :one
-SELECT * FROM accounts
+SELECT * FROM users
 WHERE id = $1
 LIMIT 1;
 
--- name: ListAccounts :many
-SELECT * FROM accounts
+-- name: ListUsers :many
+SELECT * FROM users
 ORDER BY id
 LIMIT $1
 OFFSET $2;
 
 -- name: DeleteAccount :exec
-DELETE FROM accounts
+DELETE FROM users
 WHERE id = $1;
 
 -- name: UpdateImageCount :one
-UPDATE accounts
+UPDATE users
 SET image_count = image_count + sqlc.arg(amount)
 WHERE id = sqlc.arg(id)
 RETURNING *;
 
--- name: UpdateEmail :one
-UPDATE accounts
-SET email = $2
-WHERE id = $1
-RETURNING *;
-
 -- name: UpdateSubscribed :one
-UPDATE accounts
+UPDATE users
 SET subscribed = $2
 WHERE id = $1
 RETURNING *;
