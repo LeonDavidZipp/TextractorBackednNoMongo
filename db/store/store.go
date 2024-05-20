@@ -13,7 +13,6 @@ import (
 
 type Store interface {
 	db.Querier
-	mongodb.MongoOperator
 	bucket.S3Client
 	UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error)
 	DeleteImagesTransaction(ctx context.Context, arg DeleteImagesTransactionParams) (db.User, error)
@@ -21,18 +20,14 @@ type Store interface {
 
 type DBStore struct {
 	*db.Queries
-	*mongodb.MongoOperations
 	*bucket.Client
-	UserDB  *sql.DB
-	ImageDB *mongo.Database
+	DB *sql.DB
 }
 
-func NewStore(userDB *sql.DB, imageDB *mongo.Database, s3Client *s3.Client) Store {
+func NewStore(DB *sql.DB, s3Client *s3.Client) Store {
 	return &DBStore{
 		Queries: db.New(userDB),
-		MongoOperations: mongodb.NewMongo(imageDB),
 		Client: bucket.NewS3(s3Client),
-		UserDB: userDB,
-		ImageDB: imageDB,
+		DB: DB,
 	}
 }

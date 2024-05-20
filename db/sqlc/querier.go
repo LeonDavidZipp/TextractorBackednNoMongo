@@ -11,7 +11,7 @@ import (
 type Querier interface {
 	CreateImage(ctx context.Context, arg CreateImageParams) (Image, error)
 	CreateUser(ctx context.Context, name string) (User, error)
-	DeleteImages(ctx context.Context, id int64) error
+	DeleteImages(ctx context.Context, ids []int64) error
 	DeleteUser(ctx context.Context, id int64) error
 	GetImage(ctx context.Context, id int64) (Image, error)
 	GetImageForUpdate(ctx context.Context, id int64) (Image, error)

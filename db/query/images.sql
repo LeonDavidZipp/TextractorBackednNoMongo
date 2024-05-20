@@ -17,13 +17,13 @@ LIMIT 1;
 
 -- name: ListImages :many
 SELECT * FROM images
-WHERE id = $1
+WHERE user_id = $1
 LIMIT $2
 OFFSET $3;
 
 -- name: DeleteImages :exec
 DELETE FROM images
-WHERE id = ANY($1);
+WHERE id = ANY(sqlc.arg(ids)::bigint[]);
 
 -- name: UpdateImageText :one
 UPDATE images

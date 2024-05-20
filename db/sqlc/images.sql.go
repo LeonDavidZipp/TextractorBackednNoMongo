@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/lib/pq"
 )
 
 const createImage = `-- name: CreateImage :one
@@ -37,11 +39,11 @@ func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (Image
 
 const deleteImages = `-- name: DeleteImages :exec
 DELETE FROM images
-WHERE id = ANY($1)
+WHERE id = ANY($1::bigint[])
 `
 
-func (q *Queries) DeleteImages(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteImages, id)
+func (q *Queries) DeleteImages(ctx context.Context, ids []int64) error {
+	_, err := q.db.ExecContext(ctx, deleteImages, pq.Array(ids))
 	return err
 }
 
@@ -86,19 +88,19 @@ func (q *Queries) GetImageForUpdate(ctx context.Context, id int64) (Image, error
 
 const listImages = `-- name: ListImages :many
 SELECT id, user_id, url, text, created_at FROM images
-WHERE id = $1
+WHERE user_id = $1
 LIMIT $2
 OFFSET $3
 `
 
 type ListImagesParams struct {
-	ID     int64 `json:"id"`
+	UserID int64 `json:"user_id"`
 	Limit  int32 `json:"limit"`
 	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error) {
-	rows, err := q.db.QueryContext(ctx, listImages, arg.ID, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listImages, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

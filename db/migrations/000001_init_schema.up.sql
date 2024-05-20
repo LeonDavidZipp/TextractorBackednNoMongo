@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS "users" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar NOT NULL,
-  "email" varchar NOT NULL UNIQUE,
   "image_count" bigint NOT NULL DEFAULT 0,
   "subscribed" bool NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT (now())

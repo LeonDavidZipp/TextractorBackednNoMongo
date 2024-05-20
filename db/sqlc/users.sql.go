@@ -11,7 +11,7 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (name) VALUES ($1)
-RETURNING id, name, email, image_count, subscribed, created_at
+RETURNING id, name, image_count, subscribed, created_at
 `
 
 func (q *Queries) CreateUser(ctx context.Context, name string) (User, error) {
@@ -20,7 +20,6 @@ func (q *Queries) CreateUser(ctx context.Context, name string) (User, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Email,
 		&i.ImageCount,
 		&i.Subscribed,
 		&i.CreatedAt,
@@ -39,7 +38,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, email, image_count, subscribed, created_at FROM users
+SELECT id, name, image_count, subscribed, created_at FROM users
 WHERE id = $1
 LIMIT 1
 FOR NO KEY UPDATE
@@ -51,7 +50,6 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Email,
 		&i.ImageCount,
 		&i.Subscribed,
 		&i.CreatedAt,
@@ -60,7 +58,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 }
 
 const getUserForUpdate = `-- name: GetUserForUpdate :one
-SELECT id, name, email, image_count, subscribed, created_at FROM users
+SELECT id, name, image_count, subscribed, created_at FROM users
 WHERE id = $1
 LIMIT 1
 `
@@ -71,7 +69,6 @@ func (q *Queries) GetUserForUpdate(ctx context.Context, id int64) (User, error) 
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Email,
 		&i.ImageCount,
 		&i.Subscribed,
 		&i.CreatedAt,
@@ -80,7 +77,7 @@ func (q *Queries) GetUserForUpdate(ctx context.Context, id int64) (User, error) 
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, name, email, image_count, subscribed, created_at FROM users
+SELECT id, name, image_count, subscribed, created_at FROM users
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -103,7 +100,6 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.Email,
 			&i.ImageCount,
 			&i.Subscribed,
 			&i.CreatedAt,
@@ -125,7 +121,7 @@ const updateImageCount = `-- name: UpdateImageCount :one
 UPDATE users
 SET image_count = image_count + $1
 WHERE id = $2
-RETURNING id, name, email, image_count, subscribed, created_at
+RETURNING id, name, image_count, subscribed, created_at
 `
 
 type UpdateImageCountParams struct {
@@ -139,7 +135,6 @@ func (q *Queries) UpdateImageCount(ctx context.Context, arg UpdateImageCountPara
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Email,
 		&i.ImageCount,
 		&i.Subscribed,
 		&i.CreatedAt,
@@ -151,7 +146,7 @@ const updateSubscribed = `-- name: UpdateSubscribed :one
 UPDATE users
 SET subscribed = $2
 WHERE id = $1
-RETURNING id, name, email, image_count, subscribed, created_at
+RETURNING id, name, image_count, subscribed, created_at
 `
 
 type UpdateSubscribedParams struct {
@@ -165,7 +160,6 @@ func (q *Queries) UpdateSubscribed(ctx context.Context, arg UpdateSubscribedPara
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Email,
 		&i.ImageCount,
 		&i.Subscribed,
 		&i.CreatedAt,

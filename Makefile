@@ -26,14 +26,14 @@ tidy:
 #############################################################################################################################################################################
 
 startdb:
-	docker-compose up userdb
+	docker-compose up db
 
 # creates fresh database && tables in already running db container
 createdb:
-	docker-compose exec userdb createdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
+	docker-compose exec db createdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
 
 dropdb:
-	docker-compose exec userdb dropdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
+	docker-compose exec db dropdb -U $(POSTGRES_USER) $(POSTGRES_DB_NAME)
 
 resetdb: dropdb createdb migrateup
 
@@ -44,7 +44,7 @@ migratedown:
 	docker-compose run --rm backend migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose down
 
 dbcmd:
-	docker-compose exec userdb psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
+	docker-compose exec db psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
 
 
 #############################################################################################################################################################################
