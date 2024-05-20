@@ -95,26 +95,24 @@ services:
         proxy:
         textractor_network:
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.keycloak.entrypoints=http"
-        - "traefik.http.routers.keycloak.rule=Host(`keycloak.jimsgarage.co.uk`)"
-        - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=https"
-        - "traefik.http.routers.keycloak.middlewares=keycloak-https-redirect"
-        - "traefik.http.routers.keycloak-secure.entrypoints=https"
-        - "traefik.http.routers.keycloak-secure.rule=Host(`keycloak.jimsgarage.co.uk`)*"
-        - "traefik.http.routers.keycloak-secure.tls=true"
-        - "traefik.http.routers.keycloak-secure.service=keycloak"
-        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
-        - "traefik.docker.network=proxy"
+        - "traefik.enable=${TRAEFIK_ENABLE}"
+        - "traefik.http.routers.keycloak.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_ENTRYPOINTS}"
+        - "traefik.http.routers.keycloak.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_RULE}"
+        - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=${TRAEFIK_HTTP_MIDDLEWARES_KEYCLOAK_HTTPS_REDIRECT_REDIRECTSCHEME_SCHEME}"
+        - "traefik.http.routers.keycloak.middlewares=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_MIDDLEWARES}"
+        - "traefik.http.routers.keycloak-secure.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_ENTRYPOINTS}"
+        - "traefik.http.routers.keycloak-secure.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_RULE}"
+        - "traefik.http.routers.keycloak-secure.tls=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_TLS}"
+        - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
+        - "traefik.docker.network=${TRAEFIK_DOCKER_NETWORK}"
 networks:
   proxy:
     external: true
   keycloak:
+  textractor_network:
 
 volumes:
     user-data:
     image-data:
     # cache-data:
-
-networks:
-    textractor_network:
