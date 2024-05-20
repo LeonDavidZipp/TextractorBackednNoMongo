@@ -14,7 +14,7 @@ func createRandomUser(t *testing.T) User {
 	name := util.RandomString(8)
 
 	ctx := context.Background()
-	user, err := testUserQueries.CreateUser(ctx, name)
+	user, err := testQueries.CreateUser(ctx, name)
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 
@@ -32,7 +32,7 @@ func TestGetUser(t *testing.T) {
 	user1 := createRandomUser(t)
 
 	ctx := context.Background()
-	user2, err := testUserQueries.GetUser(ctx, user1.ID)
+	user2, err := testQueries.GetUser(ctx, user1.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
@@ -54,7 +54,7 @@ func TestUpdateSubscribed(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	user2, err := testUserQueries.UpdateSubscribed(ctx, arg)
+	user2, err := testQueries.UpdateSubscribed(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
@@ -73,7 +73,7 @@ func TestUpdateImageCount(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	user2, err := testUserQueries.UpdateImageCount(ctx, arg)
+	user2, err := testQueries.UpdateImageCount(ctx, arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
@@ -88,10 +88,10 @@ func TestDeleteUser(t *testing.T) {
 	user1 := createRandomUser(t)
 
 	ctx := context.Background()
-	err := testUserQueries.DeleteUser(ctx, user1.ID)
+	err := testQueries.DeleteUser(ctx, user1.ID)
 	require.NoError(t, err)
 
-	user2, err := testUserQueries.GetUser(ctx, user1.ID)
+	user2, err := testQueries.GetUser(ctx, user1.ID)
 
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
@@ -109,7 +109,7 @@ func TestListUsers(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	users, err := testUserQueries.ListUsers(ctx, arg)
+	users, err := testQueries.ListUsers(ctx, arg)
 
 	require.NoError(t, err)
 	require.Len(t, users, 5)

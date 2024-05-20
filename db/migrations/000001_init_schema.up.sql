@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE INDEX ON "users" ("owner");
+CREATE INDEX ON "users" ("name");
 
 
 CREATE TABLE IF NOT EXISTS "images" (

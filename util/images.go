@@ -23,7 +23,7 @@ func ImageAsFileHeader(path string) (*multipart.FileHeader, error) {
 	writer := multipart.NewWriter(body)
 
 	// Create a form file
-	part, err := writer.CreateFormFile("image", filepath.Base(path))
+	part, err := writer.CreateFormFile("image", path)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func ImageAsFileHeader(path string) (*multipart.FileHeader, error) {
 	// Create a *multipart.FileHeader for the form file
 	fileHeader := multipart.FileHeader{
 		Filename: filepath.Base(path),
-		Header:   part.Header,
+		// Header:   part.Header,
 		Size:     int64(body.Len()),
 	}
 

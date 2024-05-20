@@ -4,10 +4,8 @@ import (
 	"context"
 	"testing"
 	"github.com/stretchr/testify/require"
-	"database/sql"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 	"github.com/LeonDavidZipp/Textractor/util"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
@@ -15,7 +13,7 @@ func createRandomUser(t *testing.T) db.User {
 	name := util.RandomString(8)
 
 	ctx := context.Background()
-	user, err := testUserQueries.CreateUser(ctx, name)
+	user, err := testQueries.CreateUser(ctx, name)
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 
@@ -33,7 +31,7 @@ func TestUploadImageTransaction(t *testing.T) {
 		testImageClient,
 	)
 
-	user := createRandomUser(t, RandomString(8))
+	user := createRandomUser(t)
 
 	image, err := util.ImageAsFileHeader("/app/test_files/sample.jpeg")
 	require.NoError(t, err)
@@ -79,7 +77,7 @@ func TestUploadImageTransaction(t *testing.T) {
 		
 		_, err = store.GetUser(ctx, user.ID)
 		require.NoError(t, err)
-		_, err = store.GetImage(ctx, image.ID)
+		_, err = store.GetImageFromSQL(ctx, image.ID)
 		require.NoError(t, err)
 	}
 
@@ -97,16 +95,16 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	
 	user, err := store.CreateUser(
 		ctx,
-		RandomString(8),
+		util.RandomString(8),
 	)
 	require.NoError(t, err)
 
 	amount := 2
-	imageIDs := make([]primitive.ObjectID, amount)
+	imageIDs := make([]int64, amount)
 	for i := 0; i < amount; i++ {
-		image, err := store.InsertImage(
+		image, err := store.CreateImage(
 			ctx,
-			mongodb.InsertImageParams{
+			 db.CreateImageParams{
 				UserID: user.ID,
 				Text: "some text",
 				Url: "some url",
@@ -129,14 +127,14 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	require.Equal(t, user.ImageCount - int64(len(toDelete)), updatedUser.ImageCount)
 
 	for _, id := range toDelete {
-		image, err := store.GetImage(ctx, id)
+		image, err := store.GetImageFromSQLFromSQL(ctx, id)
 		require.Error(t, err)
 		require.Empty(t, image)
 	}
 
 	remaining := imageIDs[amount/2:]
 	for _, id := range remaining {
-		image, err := store.GetImage(ctx, id)
+		image, err := store.GetImageFromSQLFromSQL(ctx, id)
 		require.NoError(t, err)
 		require.NotEmpty(t, image)
 	}

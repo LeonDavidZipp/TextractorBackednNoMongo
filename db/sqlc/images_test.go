@@ -5,6 +5,8 @@ import (
 	"time"
 	"testing"
 	"database/sql"
+	"github.com/stretchr/testify/require"
+	"github.com/LeonDavidZipp/Textractor/util"
 )
 
 
@@ -13,14 +15,14 @@ func createRandomImage(t *testing.T, userID int64) Image {
 	text := util.RandomText()
 
 	ctx := context.Background()
-	image, err := testImageQueries.CreateImage(ctx, CreateImageParams{
+	image, err := testQueries.CreateImage(ctx, CreateImageParams{
 		UserID: userID,
 		Url: url,
 		Text: text,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, image)
-	require.Equal(t, user.ID, image.UserID)
+	require.Equal(t, userID, image.UserID)
 	require.Equal(t, url, image.Url)
 	require.Equal(t, text, image.Text)
 
@@ -31,7 +33,7 @@ func createRandomImage(t *testing.T, userID int64) Image {
 }
 
 func TestCreateImage(t *testing.T) {
-	createRandomImage(t)
+	createRandomImage(t, 1)
 }
 
 func TestGetImage(t *testing.T) {
@@ -39,7 +41,7 @@ func TestGetImage(t *testing.T) {
 	image1 := createRandomImage(t, user.ID)
 
 	ctx := context.Background()
-	image2, err := testImageQueries.GetImage(ctx, image1.ID)
+	image2, err := testQueries.GetImageFromSQL(ctx, image1.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, image2)
@@ -59,7 +61,11 @@ func TestListImages(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	images, err := testImageQueries.ListImages(ctx)
+	images, err := testQueries.ListImages(ctx, ListImagesParams{
+		UserID: user.ID,
+		Limit: 5,
+		Offset: 5,
+	})
 
 	require.NoError(t, err)
 	require.Len(t, images, 5)
@@ -78,21 +84,21 @@ func TestDeleteImages(t *testing.T) {
 	user := createRandomUser(t)
 
 	var image Image
-	var imageIDs []int32
+	var imageIDs []int64
 	for i := 0; i < 10; i++ {
 		image = createRandomImage(t, user.ID)
-		imageIDs = append(imageIDs, int32(image.ID))
+		imageIDs = append(imageIDs, image.ID)
 	}
 
 	ctx := context.Background()
 
-	err := testImageQueries.DeleteImages(ctx, imageIDs)
+	err := testQueries.DeleteImages(ctx, imageIDs)
 	require.NoError(t, err)
 
 	for _, id := range imageIDs {
-		image, err = testImageQueries.GetImage(ctx, id)
+		image, err = testQueries.GetImageFromSQL(ctx, id)
 		require.Error(t, err)
-		require.EqualError(t, err, sql.ErrNoRows)
+		require.EqualError(t, err, sql.ErrNoRows.Error())
 		require.Empty(t, image)
 	}
 }
