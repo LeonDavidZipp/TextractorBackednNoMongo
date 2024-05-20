@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongo
 	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 	"mime/multipart"
 )
@@ -22,7 +21,7 @@ type UploadImageTransactionResult struct {
 // Upload Image handles uploading the necessary data and image to the databases.
 func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
 	var uploader db.User
-	var image mongodb.Image
+	var image db.Image
 	var link string
 	var text string
 
