@@ -13,13 +13,13 @@ func createRandomImage(t *testing.T, userID int64) Image {
 	ctx := context.Background()
 	image, err := testImageQueries.CreateImage(ctx, CreateImageParams{
 		UserID: userID,
-		Url: url,
+		URL: url,
 		Text: text,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, image)
 	require.Equal(t, user.ID, image.UserID)
-	require.Equal(t, url, image.Url)
+	require.Equal(t, url, image.URL)
 	require.Equal(t, text, image.Text)
 
 	require.NotZero(t, image.ID)
@@ -44,7 +44,7 @@ func TestGetImage(t *testing.T) {
 
 	require.Equal(t, image1.ID, image2.ID)
 	require.Equal(t, image1.UserID, image2.UserID)
-	require.Equal(t, image1.Url, image2.Url)
+	require.Equal(t, image1.URL, image2.URL)
 	require.Equal(t, image1.Text, image2.Text)
 
 	require.WithinDuration(t, image1.CreatedAt, image2.CreatedAt, 10 * time.Second)
@@ -66,7 +66,7 @@ func TestListImages(t *testing.T) {
 		require.NotEmpty(t, image)
 		require.NotZero(t, image.ID)
 		require.Equal(t, user.ID, image.UserID)
-		require.NotEmpty(t, image.Url)
+		require.NotEmpty(t, image.URL)
 		require.NotEmpty(t, image.Text)
 		require.NotZero(t, image.CreatedAt)
 	}

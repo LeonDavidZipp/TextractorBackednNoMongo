@@ -42,6 +42,15 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 		},
 		func(q *db.Queries) error {
 			var err error
+			image, err = q.CreateImage(ctx, db.CreateImageParams{
+				UserID: arg.UserID,
+				URL: url,
+				Text: text,
+			})
+			if err != nil {
+				return err
+			}
+
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
 				Amount: 1,
 				ID: arg.UserID,
