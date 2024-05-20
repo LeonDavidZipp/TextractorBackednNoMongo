@@ -123,7 +123,7 @@ func TestDeleteImagesTransaction(t *testing.T) {
 			mongodb.InsertImageParams{
 				UserID: user.ID,
 				Text: "some text",
-				Link: "some link",
+				URL: "some url",
 			},
 		)
 		require.NoError(t, err)

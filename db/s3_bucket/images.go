@@ -14,7 +14,7 @@ import (
 )
 
 type UploadImageResult struct {
-	Link string `json:"link"`
+	URL string `json:"url"`
 	Text string `json:"text"`
 }
 
@@ -39,7 +39,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 		return UploadImageResult{}, err
 	}
 
-	link := uploadResult.Location
+	url := uploadResult.Location
 
 	text, err := ExtractText(ctx, *input.Key)
 	if err != nil {
@@ -47,15 +47,15 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 	
 	result := UploadImageResult{
-		Link: link,
+		URL: url,
 		Text: text,
 	}
 
 	return result, nil
 }
 
-func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
-	key, err := KeyFromLink(ctx, link)
+func (c *Client) GetImage(ctx context.Context, url string) ([]byte, error) {
+	key, err := KeyFromURL(ctx, url)
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +77,10 @@ func (c *Client) GetImage(ctx context.Context, link string) ([]byte, error) {
 	return imageData, nil
 }
 
-func (c *Client) DeleteImagesFromS3(ctx context.Context, links []string) error {
+func (c *Client) DeleteImagesFromS3(ctx context.Context, urls []string) error {
 	var objectIds []types.ObjectIdentifier
-	for _, link := range links {
-		key, err := KeyFromLink(ctx, link)
+	for _, url := range urls {
+		key, err := KeyFromURL(ctx, url)
 		if err != nil {
 			return err
 		}

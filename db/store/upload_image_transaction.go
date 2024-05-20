@@ -22,7 +22,7 @@ type UploadImageTransactionResult struct {
 func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImageTransactionParams) (UploadImageTransactionResult, error) {
 	var uploader db.User
 	var image db.Image
-	var link string
+	var url string
 	var text string
 
 	err := store.execTransaction(
@@ -33,27 +33,18 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 				return err
 			}
 
-			link = result.Link
+			url = result.URL
 			text = result.Text
 			return nil
 		},
 		func(c *bucket.Client) error {
-			return c.DeleteImagesFromS3(ctx, []string{link})
+			return c.DeleteImagesFromS3(ctx, []string{url})
 		},
 		func(q *db.Queries) error {
 			var err error
 			uploader, err = q.UpdateImageCount(ctx, db.UpdateImageCountParams{
 				Amount: 1,
 				ID: arg.UserID,
-			})
-			return err
-		},
-		func(op *mongodb.MongoOperations) error {
-			var err error
-			image, err = op.InsertImage(ctx, mongodb.InsertImageParams{
-				UserID: arg.UserID,
-				Text: text,
-				Link: link,
 			})
 			return err
 		},

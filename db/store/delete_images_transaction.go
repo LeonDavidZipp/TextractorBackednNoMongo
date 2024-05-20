@@ -11,7 +11,7 @@ import (
 type DeleteImagesTransactionParams struct {
 	UserID int64                `json:"user_id"`
 	ImageIDs  []primitive.ObjectID `json:"image_ids"`
-	Links     []string             `json:"links"`
+	URLs     []string             `json:"urls"`
 	Amount    int64                `json:"amount"`
 }
 
@@ -23,7 +23,7 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 	err := store.execTransaction(
 		ctx,
 		func(c *bucket.Client) error {
-			return c.DeleteImagesFromS3(ctx, arg.Links)
+			return c.DeleteImagesFromS3(ctx, arg.URLs)
 		},
 		func(op *bucket.Client) error {
 			return nil
