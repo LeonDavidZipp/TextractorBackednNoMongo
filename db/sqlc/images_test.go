@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"time"
+	"testing"
+	"database/sql"
 )
 
 
@@ -90,7 +92,7 @@ func TestDeleteImages(t *testing.T) {
 	for _, id := range imageIDs {
 		image, err = testImageQueries.GetImage(ctx, id)
 		require.Error(t, err)
-		require.EqualError(t, err, sql.ErrNoRows.Error())
+		require.EqualError(t, err, sql.ErrNoRows)
 		require.Empty(t, image)
 	}
 }
