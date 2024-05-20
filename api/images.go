@@ -5,9 +5,6 @@ import (
 	"errors"
 	"mime/multipart"
 	"github.com/gin-gonic/gin"
-	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	st "github.com/LeonDavidZipp/Textractor/db/store"
 )
 

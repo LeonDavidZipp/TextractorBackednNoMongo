@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"database/sql"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
+	mongo
 	"github.com/LeonDavidZipp/Textractor/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

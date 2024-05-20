@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongodb "github.com/LeonDavidZipp/Textractor/db/mongo_db"
 	bucket "github.com/LeonDavidZipp/Textractor/db/s3_bucket"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
