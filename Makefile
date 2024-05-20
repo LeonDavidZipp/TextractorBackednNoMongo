@@ -17,7 +17,7 @@ stop:
 	docker-compose down
 
 tidy:
-	docker-compose run --rm app go mod tidy
+	docker-compose run --rm backend go mod tidy
 
 #############################################################################################################################################################################
 #																																											#
@@ -38,16 +38,16 @@ dropdb:
 resetdb: dropdb createdb migrateup
 
 migrateup:
-	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose up
+	docker-compose run --rm backend migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose up
 
 migratedown:
-	docker-compose run --rm app migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose down
+	docker-compose run --rm backend migrate -path ./db/migrations -database "$(POSTGRES_SOURCE)" -verbose down
 
 dbcmd:
 	docker-compose exec db psql -U exampleuser -d $(POSTGRES_DB_NAME) -c "$(cmd)"
 
-startmongo:
-	docker-compose up mongo-db
+startmdb:
+	docker-compose up imagedb
 
 # createmongo
 
@@ -58,28 +58,26 @@ startmongo:
 #############################################################################################################################################################################
 
 startapp:
-	docker-compose up app
+	docker-compose up backend
 	
 sqlc:
-	docker-compose run --rm app sh -c "sqlc generate"
+	docker-compose run --rm backend sh -c "sqlc generate"
 
 test:
-	docker-compose run --rm app sh -c "go test -v -cover ./..."
+	docker-compose run --rm backend sh -c "go test -v -cover ./..."
 
 get:
-	docker-compose run --rm app go get -u $(pkg)
+	docker-compose run --rm backend go get -u $(pkg)
 
 server:
-	docker-compose run --rm app sh -c "go run main.go"
+	docker-compose run --rm backend sh -c "go run main.go"
 
 appcmd:
-	docker-compose run --rm app sh -c "$(cmd)"
+	docker-compose run --rm backend sh -c "$(cmd)"
 
 mockdb:
-	docker-compose run --rm app sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/Textractor/db/store $(iname)"
+	docker-compose run --rm backend sh -c "mockgen -package mockdb -destination db/mock/$(dest).go github.com/LeonDavidZipp/Textractor/db/store $(iname)"
 
-startmdb:
-	docker-compose up mongo-db
 
 #############################################################################################################################################################################
 #																																											#
