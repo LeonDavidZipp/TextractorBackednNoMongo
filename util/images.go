@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"mime/multipart"
-	// "net/textproto"
 	"os"
 	"path/filepath"
 )

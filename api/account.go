@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
 )
 
 // Postgres

@@ -8,8 +8,6 @@ import (
 	"log"
 	"testing"
 	"database/sql"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	st "github.com/LeonDavidZipp/Textractor/db/store"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"

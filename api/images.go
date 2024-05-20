@@ -83,8 +83,8 @@ func (s *Server) updateImage(ctx *gin.Context) {
 // List Images
 type listImagesRequest struct {
 	UserID int64 `json:"user_id" binding:"required"`
-	Limit  int64 `json:"limit" binding:"required"`
-	Offset int64 `json:"offset" binding:"required"`
+	Limit  int32 `json:"limit" binding:"required"`
+	Offset int32 `json:"offset" binding:"required"`
 }
 
 func (s *Server) listImages(ctx *gin.Context) {
@@ -103,7 +103,7 @@ func (s *Server) listImages(ctx *gin.Context) {
 
 	images, err := s.store.ListImages(ctx, arg)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -137,11 +137,11 @@ func (s *Server) deleteImages(ctx *gin.Context) {
 		Amount: req.Amount,
 	}
 
-	err := s.store.DeleteImageTransaction(ctx, arg)
+	uploader, err := s.store.DeleteImagesTransaction(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, uploader)
 }
