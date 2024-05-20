@@ -13,22 +13,14 @@ import (
 
 
 func createRandomUser(t *testing.T) db.User {
-	arg := db.CreateUserParams{
-		Owner : util.RandomName(),
-		Email : util.RandomEmail(),
-		GoogleID : sql.NullString{},
-		FacebookID : sql.NullString{},
-	}
+	name := util.RandomString(8)
 
 	ctx := context.Background()
-	user, err := testUserQueries.CreateUser(ctx, arg)
+	user, err := testUserQueries.CreateUser(ctx, name)
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 
-	require.Equal(t, arg.Owner, user.Owner)
-	require.Equal(t, arg.Email, user.Email)
-	require.Equal(t, arg.GoogleID, user.GoogleID)
-	require.Equal(t, arg.FacebookID, user.FacebookID)
+	require.Equal(t, name, user.Name)
 
 	require.NotZero(t, user.ID)
 	require.NotZero(t, user.CreatedAt)
@@ -38,12 +30,11 @@ func createRandomUser(t *testing.T) db.User {
 
 func TestUploadImageTransaction(t *testing.T) {
 	store := NewStore(
-		testUserDB,
-		testImageDB,
+		testDB,
 		testImageClient,
 	)
 
-	user := createRandomUser(t)
+	user := createRandomUser(t, RandomString(8))
 
 	image, err := util.ImageAsFileHeader("/app/test_files/sample.jpeg")
 	require.NoError(t, err)
@@ -89,7 +80,7 @@ func TestUploadImageTransaction(t *testing.T) {
 		
 		_, err = store.GetUser(ctx, user.ID)
 		require.NoError(t, err)
-		_, err = store.FindImage(ctx, image.ID)
+		_, err = store.GetImage(ctx, image.ID)
 		require.NoError(t, err)
 	}
 
@@ -100,18 +91,14 @@ func TestUploadImageTransaction(t *testing.T) {
 
 func TestDeleteImagesTransaction(t *testing.T) {
 	store := NewStore(
-		testUserDB,
-		testImageDB,
+		testDB,
 		testImageClient,
 	)
 	ctx := context.Background()
 	
 	user, err := store.CreateUser(
 		ctx,
-		db.CreateUserParams{
-			Owner: util.RandomName(),
-			Email: util.RandomEmail(),
-		},
+		RandomString(8),
 	)
 	require.NoError(t, err)
 
@@ -143,14 +130,14 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	require.Equal(t, user.ImageCount - int64(len(toDelete)), updatedUser.ImageCount)
 
 	for _, id := range toDelete {
-		image, err := store.FindImage(ctx, id)
+		image, err := store.GetImage(ctx, id)
 		require.Error(t, err)
 		require.Empty(t, image)
 	}
 
 	remaining := imageIDs[amount/2:]
 	for _, id := range remaining {
-		image, err := store.FindImage(ctx, id)
+		image, err := store.GetImage(ctx, id)
 		require.NoError(t, err)
 		require.NotEmpty(t, image)
 	}

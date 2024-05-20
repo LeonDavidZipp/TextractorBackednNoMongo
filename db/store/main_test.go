@@ -7,10 +7,7 @@ import (
 	"os"
 	"log"
 	"testing"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	db "github.com/LeonDavidZipp/Textractor/db/sqlc"
-	mongo
-	"go.mongodb.org/mongo-driver/mongo"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
