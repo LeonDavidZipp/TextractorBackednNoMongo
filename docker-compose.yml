@@ -45,45 +45,71 @@ services:
     #     networks:
     #         - backend_network
 
+    # keycloak:
+    #   # image: bitnami/keycloak:latest
+    #   image: quay.io/keycloak/keycloak
+    #   command: start
+    #   container_name: keycloak
+    #   restart: unless-stopped
+    #   # command: start
+    #   depends_on:
+    #       - keycloak-db
+    #   # ports:
+    #   #     - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+    #   environment:
+    #       - KC_PROXY_ADDRESS_FORWARDING=${KC_PROXY_ADDRESS_FORWARDING}
+    #       - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
+    #       - KC_HOSTNAME=${KC_HOSTNAME}
+    #       - KC_PROXY=${KC_PROXY}
+    #       - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
+    #       - KC_DB=${KC_DB}
+    #       - KC_DB_USERNAME=${KC_DB_USERNAME}
+    #       - KC_DB_PASSWORD=${KC_DB_PASSWORD}
+    #       - KC_DB_URL_HOST=${KC_DB_URL_HOST}
+    #       - KC_DB_URL_PORT=${KC_DB_URL_PORT}
+    #       - KC_DB_URL_DATABASE=${KC_DB_URL_DATABASE}
+    #       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+    #       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+    #   env_file: .env
+    #   networks:
+    #     proxy:
+    #     backend_network:
+    #   labels:
+    #     - "traefik.enable=${TRAEFIK_ENABLE}"
+    #     - "traefik.http.routers.keycloak.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_ENTRYPOINTS}"
+    #     - "traefik.http.routers.keycloak.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_RULE}"
+    #     - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=${TRAEFIK_HTTP_MIDDLEWARES_KEYCLOAK_HTTPS_REDIRECT_REDIRECTSCHEME_SCHEME}"
+    #     - "traefik.http.routers.keycloak.middlewares=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_MIDDLEWARES}"
+    #     - "traefik.http.routers.keycloak-secure.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_ENTRYPOINTS}"
+    #     - "traefik.http.routers.keycloak-secure.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_RULE}"
+    #     - "traefik.http.routers.keycloak-secure.tls=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_TLS}"
+    #     - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
+    #     - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
+    #     - "traefik.docker.network=proxy"
+
     keycloak:
-      image: bitnami/keycloak:latest
-      container_name: keycloak
-      restart: unless-stopped
-      # command: start
-      depends_on:
-          - keycloak-db
-      ports:
-          - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
-      environment:
-          - KC_PROXY_ADDRESS_FORWARDING=${KC_PROXY_ADDRESS_FORWARDING}
-          - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
-          - KC_HOSTNAME=${KC_HOSTNAME}
-          - KC_PROXY=${KC_PROXY}
-          - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
-          - KC_DB=${KC_DB}
-          - KC_DB_USERNAME=${KC_DB_USERNAME}
-          - KC_DB_PASSWORD=${KC_DB_PASSWORD}
-          - KC_DB_URL_HOST=${KC_DB_URL_HOST}
-          - KC_DB_URL_PORT=${KC_DB_URL_PORT}
-          - KC_DB_URL_DATABASE=${KC_DB_URL_DATABASE}
-          - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
-          - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
-      env_file: .env
-      networks:
-        proxy:
-        backend_network:
-      labels:
-        - "traefik.enable=${TRAEFIK_ENABLE}"
-        - "traefik.http.routers.keycloak.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_ENTRYPOINTS}"
-        - "traefik.http.routers.keycloak.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_RULE}"
-        - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=${TRAEFIK_HTTP_MIDDLEWARES_KEYCLOAK_HTTPS_REDIRECT_REDIRECTSCHEME_SCHEME}"
-        - "traefik.http.routers.keycloak.middlewares=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_MIDDLEWARES}"
-        - "traefik.http.routers.keycloak-secure.entrypoints=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_ENTRYPOINTS}"
-        - "traefik.http.routers.keycloak-secure.rule=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_RULE}"
-        - "traefik.http.routers.keycloak-secure.tls=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_TLS}"
-        - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
-        - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
-        - "traefik.docker.network=${TRAEFIK_DOCKER_NETWORK}"
+        image: quay.io/keycloak/keycloak
+        command: start
+        container_name: keycloak
+        restart: unless-stopped
+        environment:
+            - KC_DB=${POSTGRES_DRIVER} #driver
+            - KC_DB_URL_HOST=keycloak-db #host->name of the service
+            - KC_DB_URL_DATABASE=${K_DB_NAME} #database name
+            - KC_DB_PASSWORD=${K_PW}
+            - KC_DB_USERNAME=${K_UNAME}
+            - KC_DB_SCHEMA=public
+            - KC_HOSTNAME_STRICT=false
+            - KEYCLOAK_ADMIN=${K_ADMIN}
+            - KEYCLOAK_ADMIN_PASSWORD=${K_ADMIN_PW}
+        env_file: .env
+        depends_on:
+            keycloak-db:
+                condition: service_healthy
+        ports:
+            - ${K_PORT}:8080
+        networks:
+            - backend_network
 
     keycloak-db:
         image: "postgres:16.2-alpine3.19"
@@ -92,10 +118,14 @@ services:
         volumes:
             - keycloak-db-data:/var/lib/postgresql/data
         environment:
-            - POSTGRES_USER=${KC_POSTGRES_USER}
-            - POSTGRES_DB=${KC_DB_NAME}
-            - POSTGRES_PASSWORD=${KC_POSTGRES_PASSWORD}
+            - POSTGRES_DB=${K_DB_NAME}
+            - POSTGRES_USER=${K_USER}
+            - POSTGRES_PASSWORD=${K_DB_PW}
         env_file: .env
+        healthcheck: 
+            test: "exit 0"
+        ports:
+            - ${K_DB_PORT}:5432
         networks:
             - backend_network
 
@@ -103,6 +133,7 @@ networks:
   proxy:
     external: true
   backend_network:
+    driver: bridge
 
 volumes:
     user-data:
