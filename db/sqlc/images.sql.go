@@ -15,7 +15,7 @@ const createImage = `-- name: CreateImage :one
 INSERT INTO images 
 (user_id, url, text)
 VALUES ($1, $2, $3)
-RETURNING id, user_id, url, text, created_at
+RETURNING id, user_id, url, preview_url, text, created_at
 `
 
 type CreateImageParams struct {
@@ -31,6 +31,7 @@ func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (Image
 		&i.ID,
 		&i.UserID,
 		&i.Url,
+		&i.PreviewUrl,
 		&i.Text,
 		&i.CreatedAt,
 	)
@@ -48,7 +49,7 @@ func (q *Queries) DeleteImages(ctx context.Context, ids []int64) error {
 }
 
 const getImageForUpdate = `-- name: GetImageForUpdate :one
-SELECT id, user_id, url, text, created_at FROM images
+SELECT id, user_id, url, preview_url, text, created_at FROM images
 WHERE id = $1
 LIMIT 1
 `
@@ -60,6 +61,7 @@ func (q *Queries) GetImageForUpdate(ctx context.Context, id int64) (Image, error
 		&i.ID,
 		&i.UserID,
 		&i.Url,
+		&i.PreviewUrl,
 		&i.Text,
 		&i.CreatedAt,
 	)
@@ -67,7 +69,7 @@ func (q *Queries) GetImageForUpdate(ctx context.Context, id int64) (Image, error
 }
 
 const getImageFromSQL = `-- name: GetImageFromSQL :one
-SELECT id, user_id, url, text, created_at FROM images
+SELECT id, user_id, url, preview_url, text, created_at FROM images
 WHERE id = $1
 LIMIT 1
 FOR NO KEY UPDATE
@@ -80,6 +82,7 @@ func (q *Queries) GetImageFromSQL(ctx context.Context, id int64) (Image, error) 
 		&i.ID,
 		&i.UserID,
 		&i.Url,
+		&i.PreviewUrl,
 		&i.Text,
 		&i.CreatedAt,
 	)
@@ -87,7 +90,7 @@ func (q *Queries) GetImageFromSQL(ctx context.Context, id int64) (Image, error) 
 }
 
 const listImages = `-- name: ListImages :many
-SELECT id, user_id, url, text, created_at FROM images
+SELECT id, user_id, url, preview_url, text, created_at FROM images
 WHERE user_id = $1
 LIMIT $2
 OFFSET $3
@@ -112,6 +115,7 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			&i.ID,
 			&i.UserID,
 			&i.Url,
+			&i.PreviewUrl,
 			&i.Text,
 			&i.CreatedAt,
 		); err != nil {
@@ -132,7 +136,7 @@ const updateImageText = `-- name: UpdateImageText :one
 UPDATE images
 SET text = $1
 WHERE id = $2
-RETURNING id, user_id, url, text, created_at
+RETURNING id, user_id, url, preview_url, text, created_at
 `
 
 type UpdateImageTextParams struct {
@@ -147,6 +151,7 @@ func (q *Queries) UpdateImageText(ctx context.Context, arg UpdateImageTextParams
 		&i.ID,
 		&i.UserID,
 		&i.Url,
+		&i.PreviewUrl,
 		&i.Text,
 		&i.CreatedAt,
 	)
@@ -157,7 +162,7 @@ const updateImageUrl = `-- name: UpdateImageUrl :one
 UPDATE images
 SET url = $1
 WHERE id = $2
-RETURNING id, user_id, url, text, created_at
+RETURNING id, user_id, url, preview_url, text, created_at
 `
 
 type UpdateImageUrlParams struct {
@@ -172,6 +177,7 @@ func (q *Queries) UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) 
 		&i.ID,
 		&i.UserID,
 		&i.Url,
+		&i.PreviewUrl,
 		&i.Text,
 		&i.CreatedAt,
 	)
