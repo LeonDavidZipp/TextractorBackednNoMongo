@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "images" (
   "id" BIGSERIAL PRIMARY KEY,
   "user_id" bigint NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
   "url" varchar NOT NULL,
+  "preview_url" varchar NOT NULL,
   "text" varchar NOT NULL DEFAULT '',
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );

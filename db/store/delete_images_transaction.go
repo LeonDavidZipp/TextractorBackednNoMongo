@@ -8,10 +8,11 @@ import (
 
 
 type DeleteImagesTransactionParams struct {
-	UserID   int64    `json:"user_id"`
-	ImageIDs []int64  `json:"image_ids"`
-	Urls     []string `json:"urls"`
-	Amount   int64    `json:"amount"`
+	UserID      int64    `json:"user_id"`
+	ImageIDs    []int64  `json:"image_ids"`
+	Urls        []string `json:"urls"`
+	PreviewUrls []string `json:"preview_urls"`
+	Amount      int64    `json:"amount"`
 }
 
 // Delete Images handles deletion of multiple images from the databases.
@@ -21,7 +22,10 @@ func (store *DBStore) DeleteImagesTransaction(ctx context.Context, arg DeleteIma
 	err := store.execTransaction(
 		ctx,
 		func(c *bucket.Client) error {
-			return c.DeleteImagesFromS3(ctx, arg.Urls)
+			return c.DeleteImagesFromS3(ctx, bucket.DeleteImagesFromS3Params{
+				Urls: arg.Urls,
+				PreviewUrls: arg.PreviewUrls,
+		})
 		},
 		func(op *bucket.Client) error {
 			return nil

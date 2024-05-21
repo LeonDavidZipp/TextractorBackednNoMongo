@@ -20,6 +20,7 @@ type Querier interface {
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	UpdateImageCount(ctx context.Context, arg UpdateImageCountParams) (User, error)
+	UpdateImagePreviewUrl(ctx context.Context, arg UpdateImagePreviewUrlParams) (Image, error)
 	UpdateImageText(ctx context.Context, arg UpdateImageTextParams) (Image, error)
 	UpdateImageUrl(ctx context.Context, arg UpdateImageUrlParams) (Image, error)
 	UpdateSubscribed(ctx context.Context, arg UpdateSubscribedParams) (User, error)

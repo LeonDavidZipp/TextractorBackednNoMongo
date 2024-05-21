@@ -9,11 +9,12 @@ import (
 )
 
 type Image struct {
-	ID        int64     `json:"id"`
-	UserID    int64     `json:"user_id"`
-	Url       string    `json:"url"`
-	Text      string    `json:"text"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         int64     `json:"id"`
+	UserID     int64     `json:"user_id"`
+	Url        string    `json:"url"`
+	PreviewUrl string    `json:"preview_url"`
+	Text       string    `json:"text"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type User struct {

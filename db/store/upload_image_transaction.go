@@ -23,6 +23,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 	var uploader db.User
 	var image db.Image
 	var url string
+	var previewUrl string
 	var text string
 
 	err := store.execTransaction(
@@ -34,17 +35,22 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			}
 
 			url = result.Url
+			previewUrl = result.PreviewUrl
 			text = result.Text
 			return nil
 		},
 		func(c *bucket.Client) error {
-			return c.DeleteImagesFromS3(ctx, []string{url})
+			return c.DeleteImagesFromS3(ctx, bucket.DeleteImagesFromS3Params{
+				Urls: []string{url},
+				PreviewUrls: []string{previewUrl},
+			})
 		},
 		func(q *db.Queries) error {
 			var err error
 			image, err = q.CreateImage(ctx, db.CreateImageParams{
 				UserID: arg.UserID,
 				Url: url,
+				PreviewUrl: previewUrl,
 				Text: text,
 			})
 			if err != nil {

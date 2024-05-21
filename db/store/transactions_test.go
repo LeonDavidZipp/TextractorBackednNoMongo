@@ -106,8 +106,9 @@ func TestDeleteImagesTransaction(t *testing.T) {
 			ctx,
 			 db.CreateImageParams{
 				UserID: user.ID,
-				Text: "some text",
 				Url: "some url",
+				PreviewUrl: "some preview url",
+				Text: "some text",
 			},
 		)
 		require.NoError(t, err)
