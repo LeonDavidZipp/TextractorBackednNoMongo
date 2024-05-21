@@ -22,10 +22,6 @@ services:
         image: "postgres:16.2-alpine3.19"
         container_name: db
         restart: unless-stopped
-        expose:
-            - ${POSTGRES_PORT}
-        ports:
-            - ${POSTGRES_PORT}:${POSTGRES_PORT}
         volumes:
             - user-data:/var/lib/postgresql/data
         environment:
@@ -86,6 +82,20 @@ services:
     #     - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
     #     - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
     #     - "traefik.docker.network=proxy"
+
+    keycloak-db:
+        image: "postgres:16.2-alpine3.19"
+        container_name: keycloak-db
+        restart: unless-stopped
+        volumes:
+            - keycloak-db-data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER=${KC_POSTGRES_USER}
+            - POSTGRES_DB=${KC_DB_NAME}
+            - POSTGRES_PASSWORD=${KC_POSTGRES_PASSWORD}
+        env_file: .env
+        networks:
+            - textractor_network
 
 networks:
   proxy:
