@@ -14,8 +14,9 @@ import (
 )
 
 type UploadImageResult struct {
-	Url string `json:"url"`
-	Text string `json:"text"`
+	Url        string `json:"url"`
+	PreviewUrl string `json:"preview_url"`
+	Text       string `json:"text"`
 }
 
 func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
@@ -25,6 +26,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 	defer img.Close()
 
+	// upload to image storage
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Key:    aws.String(fmt.Sprintf("%s_orig_name_after_%s", uuid.New().String(), image.Filename)),
@@ -41,13 +43,38 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 
 	url := uploadResult.Location
 
+	// extract text from image
 	text, err := ExtractText(ctx, *input.Key)
 	if err != nil {
 		return UploadImageResult{}, err
 	}
+
+	// upload preview storage
+	compressedImg, err := CompressImage(image)
+	if err != nil {
+		return UploadImageResult{}, err
+	}
+
+	previewInput := &s3.PutObjectInput{
+		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
+		Key:    aws.String(fmt.Sprintf("%s_preview_%s", uuid.New().String(), image.Filename)),
+		Body:   compressedImg,
+	}
+
+	previewUploadResult, err = c.Uploader.Upload(
+		ctx,
+		previewInput,
+	)
+	if err != nil {
+		return UploadImageResult{}, err
+	}
+
+	previewUrl := previewUploadResult.Location
 	
+	// return result
 	result := UploadImageResult{
 		Url: url,
+		PreviewUrl: previewUrl,
 		Text: text,
 	}
 
