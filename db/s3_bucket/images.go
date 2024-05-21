@@ -61,7 +61,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 		Body:   compressedImg,
 	}
 
-	previewUploadResult, err = c.Uploader.Upload(
+	previewUploadResult, err := c.Uploader.Upload(
 		ctx,
 		previewInput,
 	)

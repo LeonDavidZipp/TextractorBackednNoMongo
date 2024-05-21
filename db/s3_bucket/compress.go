@@ -2,21 +2,26 @@ package db
 
 import (
 	"image/jpeg"
-	"image/png"
-	"io"
+	imglib "image"
+	"mime/multipart"
+
 	compression "github.com/nurlantulemisov/imagecompression"
 )
 
 func CompressImage(image *multipart.File) (*multipart.File, error) {
-	img, err := png.Decode(file)
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-
-	compressing, err := compression.New(90)
+	img, _, err := imglib.Decode(image)
 	if err != nil {
 		return nil, err
 	}
 
-	return compressing.Compress(img)
+	// Compress the image
+	var buf bytes.Buffer
+	var opts jpeg.Options
+	opts.Quality = 75
+	err = jpeg.Encode(&buf, img, &opts)
+	if err != nil {
+		return nil, err
+	}
+
+	
 }
