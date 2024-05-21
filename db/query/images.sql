@@ -1,7 +1,7 @@
 -- name: CreateImage :one
 INSERT INTO images 
-(user_id, url, text)
-VALUES ($1, $2, $3)
+(user_id, url, preview_url, text)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetImageFromSQL :one
@@ -34,5 +34,11 @@ RETURNING *;
 -- name: UpdateImageUrl :one
 UPDATE images
 SET url = sqlc.arg(url)
+WHERE id = sqlc.arg(id)
+RETURNING *;
+
+-- name: UpdateImagePreviewUrl :one
+UPDATE images
+SET preview_url = sqlc.arg(url)
 WHERE id = sqlc.arg(id)
 RETURNING *;

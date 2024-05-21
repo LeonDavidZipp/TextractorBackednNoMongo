@@ -13,19 +13,25 @@ import (
 
 const createImage = `-- name: CreateImage :one
 INSERT INTO images 
-(user_id, url, text)
-VALUES ($1, $2, $3)
+(user_id, url, preview_url, text)
+VALUES ($1, $2, $3, $4)
 RETURNING id, user_id, url, preview_url, text, created_at
 `
 
 type CreateImageParams struct {
-	UserID int64  `json:"user_id"`
-	Url    string `json:"url"`
-	Text   string `json:"text"`
+	UserID     int64  `json:"user_id"`
+	Url        string `json:"url"`
+	PreviewUrl string `json:"preview_url"`
+	Text       string `json:"text"`
 }
 
 func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (Image, error) {
-	row := q.db.QueryRowContext(ctx, createImage, arg.UserID, arg.Url, arg.Text)
+	row := q.db.QueryRowContext(ctx, createImage,
+		arg.UserID,
+		arg.Url,
+		arg.PreviewUrl,
+		arg.Text,
+	)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -130,6 +136,32 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateImagePreviewUrl = `-- name: UpdateImagePreviewUrl :one
+UPDATE images
+SET preview_url = $1
+WHERE id = $2
+RETURNING id, user_id, url, preview_url, text, created_at
+`
+
+type UpdateImagePreviewUrlParams struct {
+	Url string `json:"url"`
+	ID  int64  `json:"id"`
+}
+
+func (q *Queries) UpdateImagePreviewUrl(ctx context.Context, arg UpdateImagePreviewUrlParams) (Image, error) {
+	row := q.db.QueryRowContext(ctx, updateImagePreviewUrl, arg.Url, arg.ID)
+	var i Image
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Url,
+		&i.PreviewUrl,
+		&i.Text,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const updateImageText = `-- name: UpdateImageText :one

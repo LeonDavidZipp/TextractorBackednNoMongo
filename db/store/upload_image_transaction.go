@@ -23,6 +23,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 	var uploader db.User
 	var image db.Image
 	var url string
+	var previewUrl string
 	var text string
 
 	err := store.execTransaction(
@@ -34,6 +35,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			}
 
 			url = result.Url
+			previewUrl = result.PreviewUrl
 			text = result.Text
 			return nil
 		},
@@ -45,6 +47,7 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			image, err = q.CreateImage(ctx, db.CreateImageParams{
 				UserID: arg.UserID,
 				Url: url,
+				PreviewUrl: previewUrl,
 				Text: text,
 			})
 			if err != nil {

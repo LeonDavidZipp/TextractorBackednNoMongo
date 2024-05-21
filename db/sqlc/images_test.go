@@ -12,12 +12,14 @@ import (
 
 func createRandomImage(t *testing.T, userID int64) Image {
 	url := util.RandomString(8)
+	previewUrl := util.RandomString(8)
 	text := util.RandomText()
 
 	ctx := context.Background()
 	image, err := testQueries.CreateImage(ctx, CreateImageParams{
 		UserID: userID,
 		Url: url,
+		PreviewUrl: url,
 		Text: text,
 	})
 	require.NoError(t, err)
