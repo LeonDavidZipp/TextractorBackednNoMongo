@@ -81,7 +81,7 @@ services:
         - "traefik.http.routers.keycloak-secure.tls=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_TLS}"
         - "traefik.http.routers.keycloak-secure.service=${TRAEFIK_HTTP_ROUTER_KEYCLOAK_SECURE_SERVICE}"
         - "traefik.http.services.keycloak.loadbalancer.server.port=${TRAEFIK_HTTP_SERVICES_KEYCLOAK_LOADBALANCER_SERVER_PORT}"
-        - "traefik.docker.network=proxy"
+        - "traefik.docker.network=${TRAEFIK_DOCKER_NETWORK}"
 
     keycloak-db:
         image: "postgres:16.2-alpine3.19"
