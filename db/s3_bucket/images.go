@@ -56,7 +56,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 
 	previewInput := &s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
+		Bucket: aws.String(os.Getenv("AWS_PREVIEW_BUCKET_NAME")),
 		Key:    aws.String(fmt.Sprintf("%s_preview_%s", uuid.New().String(), image.Filename)),
 		Body:   compressedImg,
 	}
