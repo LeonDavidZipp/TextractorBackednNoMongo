@@ -104,21 +104,43 @@ func (c *Client) GetImageFromS3(ctx context.Context, url string) ([]byte, error)
 	return imageData, nil
 }
 
-func (c *Client) DeleteImagesFromS3(ctx context.Context, urls []string) error {
+type DeleteImagesFromS3Params struct {
+	Urls        []string `json:"urls"`
+	PreviewUrls []string `json:"preview_urls"`
+}
+
+func (c *Client) DeleteImagesFromS3(ctx context.Context, arg DeleteImagesFromS3Params) error {
 	var objectIds []types.ObjectIdentifier
-	for _, url := range urls {
+	var previewObjectIds []types.ObjectIdentifier
+
+	for i, url := range arg.Urls {
 		key, err := KeyFromUrl(ctx, url)
 		if err != nil {
 			return err
 		}
 
 		objectIds = append(objectIds, types.ObjectIdentifier{Key: aws.String(key)})
+
+		previewKey, err := KeyFromUrl(ctx, arg.PreviewUrls[i])
+		if err != nil {
+			return err
+		}
+
+		previewObjectIds = append(previewObjectIds, types.ObjectIdentifier{Key: aws.String(previewKey)})
 	}
 
 	_, err := c.DeleteObjects(ctx, &s3.DeleteObjectsInput{
 		Bucket: aws.String(os.Getenv("AWS_BUCKET_NAME")),
 		Delete: &types.Delete{Objects: objectIds},
-		},
-	)
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = c.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+		Bucket: aws.String(os.Getenv("AWS_PREVIEW_BUCKET_NAME")),
+		Delete: &types.Delete{Objects: previewObjectIds},
+	})
+
 	return err
 }

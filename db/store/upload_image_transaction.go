@@ -40,7 +40,10 @@ func (store *DBStore) UploadImageTransaction(ctx context.Context, arg UploadImag
 			return nil
 		},
 		func(c *bucket.Client) error {
-			return c.DeleteImagesFromS3(ctx, []string{url})
+			return c.DeleteImagesFromS3(ctx, bucket.DeleteImagesFromS3Params{
+				Urls: []string{url},
+				PreviewUrls: []string{previewUrl},
+			})
 		},
 		func(q *db.Queries) error {
 			var err error
