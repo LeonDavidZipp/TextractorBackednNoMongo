@@ -50,8 +50,6 @@ services:
     #   container_name: auth
     #   restart: unless-stopped
     #   command: start
-    #   expose:
-    #       - ${KEYCLOAK_PORT}
     #   ports:
     #       - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
     #   environment:
