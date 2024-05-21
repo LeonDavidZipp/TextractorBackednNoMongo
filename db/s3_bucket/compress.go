@@ -22,6 +22,4 @@ func CompressImage(image *multipart.File) (*multipart.File, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	
 }
