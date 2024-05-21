@@ -104,6 +104,29 @@ func (c *Client) GetImageFromS3(ctx context.Context, url string) ([]byte, error)
 	return imageData, nil
 }
 
+func (c *Client) GetPreviewFromS3(ctx context.Context, url string) ([]byte, error) {
+	key, err := KeyFromUrl(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := c.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(os.Getenv("AWS_PREVIEW_BUCKET_NAME")),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer result.Body.Close()
+
+	imageData, err := io.ReadAll(result.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return imageData, nil
+}
+
 type DeleteImagesFromS3Params struct {
 	Urls        []string `json:"urls"`
 	PreviewUrls []string `json:"preview_urls"`
