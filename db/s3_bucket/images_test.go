@@ -31,7 +31,7 @@ func uploadImage(t *testing.T, imagePath string) (string, string) {
 	require.NotEmpty(t, previewUrl)
 	require.NotEmpty(t, text)
 
-	return url
+	return url, previewUrl
 }
 
 func TestUploadImage(t *testing.T) {

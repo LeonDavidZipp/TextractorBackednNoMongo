@@ -45,41 +45,41 @@ services:
     #     networks:
     #         - backend_network
 
-    keycloak:
-      image: quay.io/keycloak/keycloak:23.0.7
-      container_name: keycloak
-      environment:
-        KC_DB: ${POSTGRES_DRIVER}
-        KC_DB_URL: ${K_DB_URL}
-        KC_DB_USERNAME: ${K_DB_USER}
-        KC_DB_PASSWORD: ${K_DB_PW}
+    # keycloak:
+    #   image: quay.io/keycloak/keycloak:23.0.7
+    #   container_name: keycloak
+    #   environment:
+    #     KC_DB: ${POSTGRES_DRIVER}
+    #     KC_DB_URL: ${K_DB_URL}
+    #     KC_DB_USERNAME: ${K_DB_USER}
+    #     KC_DB_PASSWORD: ${K_DB_PW}
 
-        KC_HOSTNAME: ${K_HNAME}
-        KC_HOSTNAME_PORT: 5433
-        KC_HOSTNAME_STRICT: false
-        KC_HOSTNAME_STRICT_HTTPS: false
+    #     KC_HOSTNAME: ${K_HNAME}
+    #     KC_HOSTNAME_PORT: 5433
+    #     KC_HOSTNAME_STRICT: false
+    #     KC_HOSTNAME_STRICT_HTTPS: false
 
-        KC_LOG_LEVEL: info
-        KC_METRICS_ENABLED: true
-        KC_HEALTH_ENABLED: true
-        KEYCLOAK_ADMIN: ${K_ADMIN}
-        KEYCLOAK_ADMIN_PASSWORD: ${K_ADMIN_PW}
-      env_file: .env
-      command: start-dev
-      depends_on:
-        - keycloakdb
-      ports:
-        - 8080:8080
+    #     KC_LOG_LEVEL: info
+    #     KC_METRICS_ENABLED: true
+    #     KC_HEALTH_ENABLED: true
+    #     KEYCLOAK_ADMIN: ${K_ADMIN}
+    #     KEYCLOAK_ADMIN_PASSWORD: ${K_ADMIN_PW}
+    #   env_file: .env
+    #   command: start-dev
+    #   depends_on:
+    #     - keycloakdb
+    #   ports:
+    #     - 8080:8080
 
-    keycloakdb:
-      image: postgres:16.2-alpine3.19
-      container_name: keycloakdb
-      volumes:
-        - keycloakdb-data:/var/lib/postgresql/data
-      environment:
-        POSTGRES_DB: keycloak
-        POSTGRES_USER: ${K_DB_USER}
-        POSTGRES_PASSWORD: ${K_DB_PW}
+    # keycloakdb:
+    #   image: postgres:16.2-alpine3.19
+    #   container_name: keycloakdb
+    #   volumes:
+    #     - keycloakdb-data:/var/lib/postgresql/data
+    #   environment:
+    #     POSTGRES_DB: keycloak
+    #     POSTGRES_USER: ${K_DB_USER}
+    #     POSTGRES_PASSWORD: ${K_DB_PW}
 
 networks:
   proxy:

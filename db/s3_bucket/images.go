@@ -50,7 +50,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 	}
 
 	// upload preview storage
-	compressedImg, err := CompressImage(image)
+	compressedImg, err := CompressImage(&img)
 	if err != nil {
 		return UploadImageResult{}, err
 	}

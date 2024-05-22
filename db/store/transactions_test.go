@@ -128,14 +128,14 @@ func TestDeleteImagesTransaction(t *testing.T) {
 	require.Equal(t, user.ImageCount - int64(len(toDelete)), updatedUser.ImageCount)
 
 	for _, id := range toDelete {
-		image, err := store.GetImageFromSQLFromSQL(ctx, id)
+		image, err := store.GetImageFromSQL(ctx, id)
 		require.Error(t, err)
 		require.Empty(t, image)
 	}
 
 	remaining := imageIDs[amount/2:]
 	for _, id := range remaining {
-		image, err := store.GetImageFromSQLFromSQL(ctx, id)
+		image, err := store.GetImageFromSQL(ctx, id)
 		require.NoError(t, err)
 		require.NotEmpty(t, image)
 	}

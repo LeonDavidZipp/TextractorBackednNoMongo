@@ -19,7 +19,7 @@ func createRandomImage(t *testing.T, userID int64) Image {
 	image, err := testQueries.CreateImage(ctx, CreateImageParams{
 		UserID: userID,
 		Url: url,
-		PreviewUrl: url,
+		PreviewUrl: previewUrl,
 		Text: text,
 	})
 	require.NoError(t, err)
