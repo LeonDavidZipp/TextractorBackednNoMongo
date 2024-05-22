@@ -77,7 +77,6 @@ func (s *Server) updateImage(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 	}
-
 }
 
 // List Images

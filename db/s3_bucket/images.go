@@ -22,6 +22,7 @@ type UploadImageResult struct {
 func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.FileHeader) (UploadImageResult, error) {
 	img, err := image.Open()
 	if err != nil {
+		fmt.Println("error here")
 		return UploadImageResult{}, err
 	}
 	defer img.Close()
@@ -41,6 +42,7 @@ func (c *Client) UploadAndExtractImage(ctx context.Context, image *multipart.Fil
 		return UploadImageResult{}, err
 	}
 
+	fmt.Println("image uploaded")
 	url := uploadResult.Location
 
 	// extract text from image
