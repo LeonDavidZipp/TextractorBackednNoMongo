@@ -6,8 +6,8 @@ services:
             target: dev # target stage to build, CHANGE to prod for production
         container_name: backend
         restart: unless-stopped
-        # ports:
-        #     - ${BACKEND_PORT}:${BACKEND_PORT}
+        ports:
+            - ${BACKEND_PORT}:${BACKEND_PORT}
         depends_on:
             - db
         volumes: # remove after testing
