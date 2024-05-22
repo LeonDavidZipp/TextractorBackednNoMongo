@@ -1,35 +1,35 @@
 services:
-    backend: # app
-        build:
-            context: .
-            dockerfile: Dockerfile.backend
-            target: dev # target stage to build, CHANGE to prod for production
-        container_name: backend
-        restart: unless-stopped
-        # ports:
-        #     - ${BACKEND_PORT}:${BACKEND_PORT}
-        depends_on:
-            - db
-        volumes: # remove after testing
-            - .:/app
-        env_file: .env
-        networks:
-            - backend_network
+    # backend: # app
+    #     build:
+    #         context: .
+    #         dockerfile: Dockerfile.backend
+    #         target: dev # target stage to build, CHANGE to prod for production
+    #     container_name: backend
+    #     restart: unless-stopped
+    #     # ports:
+    #     #     - ${BACKEND_PORT}:${BACKEND_PORT}
+    #     depends_on:
+    #         - db
+    #     volumes: # remove after testing
+    #         - .:/app
+    #     env_file: .env
+    #     networks:
+    #         - backend_network
 
-    db: # db
-        image: "postgres:16.2-alpine3.19"
-        container_name: db
-        restart: unless-stopped
-        ports:
-            - ${DB_PORT}:${DB_PORT} #for testing
-        volumes:
-            - user-data:/var/lib/postgresql/data
-        environment:
-            - POSTGRES_USER=${POSTGRES_USER}
-            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-        env_file: .env
-        networks:
-            - backend_network
+    # db: # db
+    #     image: "postgres:16.2-alpine3.19"
+    #     container_name: db
+    #     restart: unless-stopped
+    #     ports:
+    #         - ${DB_PORT}:${DB_PORT} #for testing
+    #     volumes:
+    #         - user-data:/var/lib/postgresql/data
+    #     environment:
+    #         - POSTGRES_USER=${POSTGRES_USER}
+    #         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    #     env_file: .env
+    #     networks:
+    #         - backend_network
 
     # cache:
     #     image: redis:latest
@@ -55,7 +55,7 @@ services:
         KC_DB_PASSWORD: ${K_DB_PW}
 
         KC_HOSTNAME: ${K_HNAME}
-        KC_HOSTNAME_PORT: 8080
+        KC_HOSTNAME_PORT: 5433
         KC_HOSTNAME_STRICT: false
         KC_HOSTNAME_STRICT_HTTPS: false
 
